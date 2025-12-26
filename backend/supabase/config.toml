@@ -1,0 +1,7 @@
+# Supabase Configuration
+project_id = "initial-setup"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
