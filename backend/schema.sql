@@ -4,6 +4,8 @@ create table events (
   name text not null,
   date timestamp with time zone not null,
   location text not null,
+  capacity int,
+  requires_approval boolean default false,
   created_at timestamp with time zone default now()
 );
 
@@ -13,6 +15,7 @@ create table attendees (
   name text not null,
   email text not null,
   checked_in boolean default false,
+  status text default 'confirmed', -- 'confirmed', 'pending', 'rejected'
   event_id uuid references events(id) on delete cascade,
   created_at timestamp with time zone default now()
 );

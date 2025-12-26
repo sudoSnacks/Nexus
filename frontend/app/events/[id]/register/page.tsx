@@ -1,6 +1,7 @@
 import { registerAttendee } from '../../actions'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import BackgroundGradient from "@/components/BackgroundGradient";
 
 export default async function RegisterPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -8,47 +9,66 @@ export default async function RegisterPage({ params }: { params: Promise<{ id: s
     const { data: event } = await supabase.from('events').select('*').eq('id', id).single()
 
     if (!event) {
-        redirect('/')
+        redirect('/?error=Event not found')
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-900 text-gray-100 font-sans">
-            <div className="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-xl shadow-2xl border border-gray-700">
-                <div className="text-center">
-                    <h2 className="text-3xl font-bold tracking-tight text-white">
-                        Register for {event.name}
+        <div className="flex min-h-screen items-center justify-center p-4 font-sans text-white">
+            <BackgroundGradient />
+
+            <div className="w-full max-w-md p-8 relative bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl">
+                <div className="text-center space-y-2">
+                    <span className="text-purple-400 text-xs font-bold tracking-widest uppercase">Event Registration</span>
+                    <h2 className="text-4xl font-extrabold holo-text">
+                        {event.name}
                     </h2>
-                    <p className="mt-2 text-gray-400">
-                        {new Date(event.date).toLocaleDateString("en-US", {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "numeric"
-                        })} <br />
-                        {event.location}
-                    </p>
+                    <div className="flex flex-col items-center gap-1 text-gray-300 mt-4 text-sm">
+                        <p className="flex items-center gap-2">
+                            📅 {new Date(event.date).toLocaleDateString("en-US", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "numeric"
+                            })}
+                        </p>
+                        <p className="flex items-center gap-2">📍 {event.location}</p>
+                    </div>
                 </div>
 
-                <form action={registerAttendee} className="mt-8 space-y-6">
+                <form action={registerAttendee} className="mt-10 space-y-6">
                     <input type="hidden" name="event_id" value={event.id} />
-                    <div className="space-y-4 rounded-md shadow-sm">
+                    <div className="space-y-4">
                         <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-400">Your Name</label>
-                            <input id="name" name="name" type="text" required className="mt-1 block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6 pl-3" />
+                            <label htmlFor="name" className="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5 ml-1">Full Name</label>
+                            <input
+                                id="name"
+                                name="name"
+                                type="text"
+                                required
+                                className="block w-full rounded-lg border border-white/10 bg-white/5 py-3 px-4 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all outline-none"
+                                placeholder="John Doe"
+                            />
                         </div>
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-400">Email Address</label>
-                            <input id="email" name="email" type="email" required className="mt-1 block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6 pl-3" />
+                            <label htmlFor="email" className="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5 ml-1">Email Address</label>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                required
+                                className="block w-full rounded-lg border border-white/10 bg-white/5 py-3 px-4 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all outline-none"
+                                placeholder="john@example.com"
+                            />
                         </div>
                     </div>
 
-                    <div className="flex gap-4">
-                        <button type="submit" className="flex-1 justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                            Register
+                    <div className="pt-4 flex gap-3">
+                        <button type="submit" className="flex-1 justify-center rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-purple-100 px-4 py-3 text-sm font-bold shadow-lg shadow-purple-900/10 hover:shadow-purple-900/30 backdrop-blur-md transition-all">
+                            Get Ticket
                         </button>
-                        <a href="/" className="flex-1 flex justify-center items-center rounded-md border border-gray-600 bg-transparent px-3 py-2 text-sm font-semibold text-gray-300 hover:bg-gray-700">
+                        <a href="/events" className="flex-none flex items-center justify-center rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-3 text-sm font-semibold text-gray-200 backdrop-blur-md transition-all">
                             Cancel
                         </a>
                     </div>
