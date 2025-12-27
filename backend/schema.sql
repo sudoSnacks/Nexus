@@ -15,6 +15,7 @@ create table attendees (
   name text not null,
   email text not null,
   checked_in boolean default false,
+  email_sent boolean default false,
   status text default 'confirmed', -- 'confirmed', 'pending', 'rejected'
   event_id uuid references events(id) on delete cascade,
   created_at timestamp with time zone default now()
