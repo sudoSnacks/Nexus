@@ -24,6 +24,7 @@ export default async function MyTicketsPage() {
       )
     `)
         .eq("email", user.email)
+        .neq('status', 'rejected') // Filter out rejected tickets
         .order('created_at', { ascending: false });
 
     return (
@@ -102,9 +103,15 @@ export default async function MyTicketsPage() {
 
                                 {/* Action Footer */}
                                 <div className="p-4 bg-black/20 border-t border-white/10">
-                                    <Link href={`/tickets/${ticket.id}`} className="block w-full text-center bg-white/10 hover:bg-white/20 text-white font-medium py-2 rounded-lg transition-colors border border-white/10">
-                                        View Ticket
-                                    </Link>
+                                    {ticket.status === 'pending' ? (
+                                        <button disabled className="block w-full text-center bg-yellow-500/10 text-yellow-500 font-medium py-2 rounded-lg border border-yellow-500/20 cursor-not-allowed opacity-75">
+                                            Waiting for Confirmation
+                                        </button>
+                                    ) : (
+                                        <Link href={`/tickets/${ticket.id}`} className="block w-full text-center bg-white/10 hover:bg-white/20 text-white font-medium py-2 rounded-lg transition-colors border border-white/10">
+                                            View Ticket
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         ))}

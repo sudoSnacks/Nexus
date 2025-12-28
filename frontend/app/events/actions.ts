@@ -4,7 +4,12 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
+import { isAdmin, isHelper } from '@/utils/roles'
+
 export async function createEvent(formData: FormData) {
+    if (!await isAdmin()) {
+        redirect('/events?error=Unauthorized')
+    }
     const supabase = await createClient()
 
     const data = {
@@ -27,6 +32,9 @@ export async function createEvent(formData: FormData) {
 }
 
 export async function updateEvent(formData: FormData) {
+    if (!await isAdmin()) {
+        redirect('/events?error=Unauthorized')
+    }
     const supabase = await createClient()
 
     const id = formData.get('id') as string
@@ -50,6 +58,9 @@ export async function updateEvent(formData: FormData) {
 }
 
 export async function deleteEvent(id: string) {
+    if (!await isAdmin()) {
+        redirect('/events?error=Unauthorized')
+    }
     const supabase = await createClient()
 
     // Constraint: Cascade delete on schema handles attendees
@@ -120,6 +131,10 @@ export async function registerAttendee(formData: FormData) {
 }
 
 export async function updateAttendeeStatus(attendeeId: string, status: string) {
+    if (!await isAdmin()) {
+        // Only Admins can manually update status
+        redirect('/?error=Unauthorized')
+    }
     const supabase = await createClient()
 
     const { error } = await supabase.from('attendees').update({ status }).eq('id', attendeeId)
@@ -133,6 +148,9 @@ export async function updateAttendeeStatus(attendeeId: string, status: string) {
 }
 
 export async function confirmAllAttendees(eventId: string) {
+    if (!await isAdmin()) {
+        redirect('/?error=Unauthorized')
+    }
     const supabase = await createClient()
 
     const { error } = await supabase.from('attendees').update({ status: 'confirmed' }).eq('event_id', eventId).eq('status', 'pending')

@@ -24,6 +24,11 @@ export default function LoginPage() {
                             <label htmlFor="password" className="sr-only">Password</label>
                             <input id="password" name="password" type="password" autoComplete="current-password" required className="relative block w-full rounded-md border-white/10 bg-black/20 text-white placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 pl-3 py-2" placeholder="Password" />
                         </div>
+                        <div className="flex items-center justify-end">
+                            <a href="/forgot-password" className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+                                Forgot password?
+                            </a>
+                        </div>
                     </div>
 
                     <div className="flex gap-4">

@@ -40,6 +40,21 @@ export async function signup(formData: FormData) {
     redirect('/')
 }
 
+export async function resetPassword(formData: FormData) {
+    const supabase = await createClient()
+    const email = formData.get('email') as string
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/update-password`,
+    })
+
+    if (error) {
+        redirect(`/error?message=${encodeURIComponent(error.message)}`)
+    }
+
+    redirect('/login?message=Check your email for the reset link')
+}
+
 export async function signout() {
     const supabase = createClient()
     const { error } = await (await supabase).auth.signOut()

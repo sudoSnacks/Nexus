@@ -12,6 +12,8 @@ export default async function RegisterPage({ params }: { params: Promise<{ id: s
         redirect('/?error=Event not found')
     }
 
+    const { data: { user } } = await supabase.auth.getUser()
+
     return (
         <div className="flex min-h-screen items-center justify-center p-4 font-sans text-white">
             <BackgroundGradient />
@@ -58,6 +60,7 @@ export default async function RegisterPage({ params }: { params: Promise<{ id: s
                                 name="email"
                                 type="email"
                                 required
+                                defaultValue={user?.email || ''}
                                 className="block w-full rounded-lg border border-white/10 bg-white/5 py-3 px-4 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all outline-none"
                                 placeholder="john@example.com"
                             />

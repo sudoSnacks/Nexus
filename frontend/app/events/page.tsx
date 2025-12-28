@@ -4,13 +4,14 @@ import { deleteEvent } from "@/app/events/actions";
 import Link from "next/link";
 import { Home, Shield } from "lucide-react";
 import BackgroundGradient from "@/components/BackgroundGradient";
-import { isAdmin } from "@/utils/roles";
+import { isAdmin, isHelper } from "@/utils/roles";
 
 export default async function EventsPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     const { data: events } = await supabase.from("events").select("*").order('date', { ascending: true });
     const isUserAdmin = await isAdmin();
+    const isUserHelper = await isHelper();
 
     return (
         <div className="min-h-screen text-gray-100 font-sans">
@@ -20,25 +21,27 @@ export default async function EventsPage() {
                     <Home className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
                 </Link>
                 {user ? (
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-4">
                         {isUserAdmin && (
                             <Link
                                 href="/admin/helpers"
-                                className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 border border-purple-500/30 text-purple-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hidden md:flex items-center gap-2 font-medium"
+                                className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 border border-purple-500/30 text-purple-100 px-2 py-1 text-xs md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hidden md:flex items-center gap-2 font-medium"
                             >
                                 <Shield className="w-4 h-4" />
                                 Manage Helpers
                             </Link>
                         )}
-                        <Link
-                            href="/events/new"
-                            className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hover:shadow-white/10 font-medium"
-                        >
-                            + Create Event
-                        </Link>
+                        {isUserAdmin && (
+                            <Link
+                                href="/events/new"
+                                className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-2 py-1 text-xs md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hover:shadow-white/10 font-medium"
+                            >
+                                + Create Event
+                            </Link>
+                        )}
                         <Link
                             href="/tickets"
-                            className="bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hover:shadow-blue-500/20 font-medium"
+                            className="bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-100 px-2 py-1 text-xs md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hover:shadow-blue-500/20 font-medium"
                         >
                             My Tickets
                         </Link>
@@ -94,7 +97,7 @@ export default async function EventsPage() {
                                 <Link href={`/events/${event.id}/register`} className="flex-1 bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 text-green-100 font-medium py-2 px-3 rounded-lg backdrop-blur-md transition-all text-center shadow-lg hover:shadow-green-500/20">
                                     Register
                                 </Link>
-                                {user && (
+                                {user && isUserHelper && (
                                     <Link href={`/events/${event.id}/attendees`} className="flex-[2] bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 text-indigo-100 font-medium py-2 px-3 rounded-lg backdrop-blur-md transition-all text-center shadow-lg hover:shadow-indigo-500/20">
                                         Manage Event
                                     </Link>
@@ -106,7 +109,7 @@ export default async function EventsPage() {
                     {(!events || events.length === 0) && (
                         <div className="col-span-full text-center py-12 text-gray-500 bg-gray-800/50 rounded-xl border border-gray-800 border-dashed">
                             <p className="text-xl mb-4">No events found.</p>
-                            {user && (
+                            {user && isUserAdmin && (
                                 <Link href="/events/new" className="text-indigo-400 hover:text-indigo-300 underline">
                                     Create the first one!
                                 </Link>

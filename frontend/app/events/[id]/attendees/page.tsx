@@ -4,12 +4,14 @@ import Link from 'next/link'
 import { ArrowLeft, Check, X, Mail, CheckCircle, Edit, Trash2, Award, QrCode, RefreshCw } from 'lucide-react'
 import { updateAttendeeStatus, confirmAllAttendees } from '../../actions'
 import { resendAttendeeEmail } from '@/actions/email'
+import { isAdmin } from '@/utils/roles'
 
 import BackgroundGradient from '@/components/BackgroundGradient'
 
 export default async function AttendeesPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
     const { id } = await params
+    const admin = await isAdmin()
 
     // Fetch event to confirm it exists and get details
     const { data: event } = await supabase.from('events').select('*').eq('id', id).single()
@@ -26,55 +28,59 @@ export default async function AttendeesPage({ params }: { params: Promise<{ id: 
         .order('created_at', { ascending: false })
 
     return (
-        <div className="min-h-screen text-gray-100 font-sans p-8">
+        <div className="min-h-screen text-gray-100 font-sans p-4 md:p-8">
             <BackgroundGradient />
             <div className="max-w-6xl mx-auto space-y-8">
 
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div className="space-y-1">
                         <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
                             <Link href="/events" className="hover:text-white transition-colors flex items-center gap-1">
                                 <ArrowLeft className="w-4 h-4" /> Back to Dashboard
                             </Link>
                         </div>
-                        <h1 className="text-3xl font-bold text-white">Attendee Management</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-white">Attendee Management</h1>
                         <p className="text-indigo-400 font-medium text-lg">{event.name}</p>
                     </div>
 
-                    <div className="flex gap-3">
-                        <Link href="/scanner" className="flex items-center gap-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-purple-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
+                    <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                        <Link href="/scanner" className="flex items-center justify-center gap-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-purple-100 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
                             <QrCode className="w-4 h-4" />
                             Scanner
                         </Link>
-                        <form action={confirmAllAttendees.bind(null, id)}>
-                            <button className="flex items-center gap-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 text-green-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
-                                <CheckCircle className="w-4 h-4" />
-                                Confirm All
-                            </button>
-                        </form>
-                        <Link href={`/events/${id}/email`} className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
-                            <Mail className="w-4 h-4" />
-                            Send Emails
-                        </Link>
-                        <Link href={`/events/${id}/certificates`} className="flex items-center gap-2 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/30 text-yellow-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
-                            <Award className="w-4 h-4" />
-                            Send Certificates
-                        </Link>
-                        <div className="h-8 w-px bg-white/10 mx-2"></div>
-                        <Link href={`/events/${id}/edit`} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 text-gray-200 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
-                            <Edit className="w-4 h-4" />
-                            Edit
-                        </Link>
-                        <Link href={`/events/${id}/delete`} className="flex items-center gap-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
-                            <Trash2 className="w-4 h-4" />
-                            Delete
-                        </Link>
+                        {admin && (
+                            <>
+                                <form action={confirmAllAttendees.bind(null, id)}>
+                                    <button className="flex items-center justify-center gap-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 text-green-100 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
+                                        <CheckCircle className="w-4 h-4" />
+                                        Confirm All
+                                    </button>
+                                </form>
+                                <Link href={`/events/${id}/email`} className="flex items-center justify-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-100 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
+                                    <Mail className="w-4 h-4" />
+                                    Send Emails
+                                </Link>
+                                <Link href={`/events/${id}/certificates`} className="flex items-center justify-center gap-2 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/30 text-yellow-100 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
+                                    <Award className="w-4 h-4" />
+                                    Send Certificates
+                                </Link>
+                                <div className="hidden md:block h-8 w-px bg-white/10 mx-2"></div>
+                                <Link href={`/events/${id}/edit`} className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 text-gray-200 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
+                                    <Edit className="w-4 h-4" />
+                                    Edit
+                                </Link>
+                                <Link href={`/events/${id}/delete`} className="flex items-center justify-center gap-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-100 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
+                                    <Trash2 className="w-4 h-4" />
+                                    Delete
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                     <div className="bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10">
                         <p className="text-gray-400 text-sm">Total Attendees</p>
                         <p className="text-3xl font-bold text-white">{attendees?.length || 0}</p>
@@ -137,19 +143,23 @@ export default async function AttendeesPage({ params }: { params: Promise<{ id: 
                                                 <RefreshCw className="w-4 h-4" />
                                             </button>
                                         </form>
-                                        <Link href={`/admin/check-in/${attendee.id}`} title="Verify Ticket" className="p-2 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 rounded-lg transition-colors">
+                                        <Link href="/scanner" title="Verify Ticket" className="p-2 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 rounded-lg transition-colors">
                                             <QrCode className="w-4 h-4" />
                                         </Link>
-                                        <form action={updateAttendeeStatus.bind(null, attendee.id, 'confirmed')}>
-                                            <button title="Confirm" className="p-2 hover:bg-green-500/20 text-gray-400 hover:text-green-400 rounded-lg transition-colors">
-                                                <Check className="w-4 h-4" />
-                                            </button>
-                                        </form>
-                                        <form action={updateAttendeeStatus.bind(null, attendee.id, 'rejected')}>
-                                            <button title="Reject" className="p-2 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-lg transition-colors">
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        </form>
+                                        {admin && (
+                                            <>
+                                                <form action={updateAttendeeStatus.bind(null, attendee.id, 'confirmed')}>
+                                                    <button title="Confirm" className="p-2 hover:bg-green-500/20 text-gray-400 hover:text-green-400 rounded-lg transition-colors">
+                                                        <Check className="w-4 h-4" />
+                                                    </button>
+                                                </form>
+                                                <form action={updateAttendeeStatus.bind(null, attendee.id, 'rejected')}>
+                                                    <button title="Reject" className="p-2 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-lg transition-colors">
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </form>
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
