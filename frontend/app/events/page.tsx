@@ -2,13 +2,15 @@ import { createClient } from "@/utils/supabase/server";
 import { signout } from "@/app/auth/actions";
 import { deleteEvent } from "@/app/events/actions";
 import Link from "next/link";
-import { Home } from "lucide-react";
+import { Home, Shield } from "lucide-react";
 import BackgroundGradient from "@/components/BackgroundGradient";
+import { isAdmin } from "@/utils/roles";
 
 export default async function EventsPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     const { data: events } = await supabase.from("events").select("*").order('date', { ascending: true });
+    const isUserAdmin = await isAdmin();
 
     return (
         <div className="min-h-screen text-gray-100 font-sans">
@@ -19,6 +21,15 @@ export default async function EventsPage() {
                 </Link>
                 {user ? (
                     <div className="flex items-center gap-4">
+                        {isUserAdmin && (
+                            <Link
+                                href="/admin/helpers"
+                                className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 border border-purple-500/30 text-purple-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hidden md:flex items-center gap-2 font-medium"
+                            >
+                                <Shield className="w-4 h-4" />
+                                Manage Helpers
+                            </Link>
+                        )}
                         <Link
                             href="/events/new"
                             className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hover:shadow-white/10 font-medium"

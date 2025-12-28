@@ -1,8 +1,10 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Check, X, Mail, CheckCircle, Edit, Trash2 } from 'lucide-react'
+import { ArrowLeft, Check, X, Mail, CheckCircle, Edit, Trash2, Award, QrCode, RefreshCw } from 'lucide-react'
 import { updateAttendeeStatus, confirmAllAttendees } from '../../actions'
+import { resendAttendeeEmail } from '@/actions/email'
+
 import BackgroundGradient from '@/components/BackgroundGradient'
 
 export default async function AttendeesPage({ params }: { params: Promise<{ id: string }> }) {
@@ -41,6 +43,10 @@ export default async function AttendeesPage({ params }: { params: Promise<{ id: 
                     </div>
 
                     <div className="flex gap-3">
+                        <Link href="/scanner" className="flex items-center gap-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-purple-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
+                            <QrCode className="w-4 h-4" />
+                            Scanner
+                        </Link>
                         <form action={confirmAllAttendees.bind(null, id)}>
                             <button className="flex items-center gap-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 text-green-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
                                 <CheckCircle className="w-4 h-4" />
@@ -50,6 +56,10 @@ export default async function AttendeesPage({ params }: { params: Promise<{ id: 
                         <Link href={`/events/${id}/email`} className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
                             <Mail className="w-4 h-4" />
                             Send Emails
+                        </Link>
+                        <Link href={`/events/${id}/certificates`} className="flex items-center gap-2 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/30 text-yellow-100 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
+                            <Award className="w-4 h-4" />
+                            Send Certificates
                         </Link>
                         <div className="h-8 w-px bg-white/10 mx-2"></div>
                         <Link href={`/events/${id}/edit`} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 text-gray-200 px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
@@ -64,7 +74,7 @@ export default async function AttendeesPage({ params }: { params: Promise<{ id: 
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div className="bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10">
                         <p className="text-gray-400 text-sm">Total Attendees</p>
                         <p className="text-3xl font-bold text-white">{attendees?.length || 0}</p>
@@ -74,19 +84,24 @@ export default async function AttendeesPage({ params }: { params: Promise<{ id: 
                         <p className="text-3xl font-bold text-green-400">{attendees?.filter(a => a.status === 'confirmed').length || 0}</p>
                     </div>
                     <div className="bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10">
+                        <p className="text-gray-400 text-sm">Checked In</p>
+                        <p className="text-3xl font-bold text-blue-400">{attendees?.filter(a => a.checked_in).length || 0}</p>
+                    </div>
+                    <div className="bg-white/5 backdrop-blur-md p-6 rounded-xl border border-white/10">
                         <p className="text-gray-400 text-sm">Pending Approval</p>
                         <p className="text-3xl font-bold text-yellow-400">{attendees?.filter(a => a.status === 'pending').length || 0}</p>
                     </div>
                 </div>
 
                 {/* Table */}
-                <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
-                    <table className="w-full text-left border-collapse">
+                <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                             <tr className="bg-gray-700/50 text-gray-400 text-sm uppercase tracking-wider">
                                 <th className="p-4 font-medium">Name</th>
                                 <th className="p-4 font-medium">Email</th>
                                 <th className="p-4 font-medium">Status</th>
+                                <th className="p-4 font-medium">Check-in</th>
                                 <th className="p-4 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
@@ -104,7 +119,27 @@ export default async function AttendeesPage({ params }: { params: Promise<{ id: 
                                             {attendee.status}
                                         </span>
                                     </td>
+                                    <td className="p-4">
+                                        {attendee.checked_in ? (
+                                            <span className="text-green-400 flex items-center gap-1 text-sm">
+                                                <CheckCircle className="w-4 h-4" /> Checked In
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-500 text-sm">Not Checked In</span>
+                                        )}
+                                    </td>
                                     <td className="p-4 text-right flex justify-end gap-2">
+                                        <form action={async () => {
+                                            "use server";
+                                            await resendAttendeeEmail(attendee.id);
+                                        }}>
+                                            <button title="Resend Email" className="p-2 hover:bg-yellow-500/20 text-gray-400 hover:text-yellow-400 rounded-lg transition-colors">
+                                                <RefreshCw className="w-4 h-4" />
+                                            </button>
+                                        </form>
+                                        <Link href={`/admin/check-in/${attendee.id}`} title="Verify Ticket" className="p-2 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 rounded-lg transition-colors">
+                                            <QrCode className="w-4 h-4" />
+                                        </Link>
                                         <form action={updateAttendeeStatus.bind(null, attendee.id, 'confirmed')}>
                                             <button title="Confirm" className="p-2 hover:bg-green-500/20 text-gray-400 hover:text-green-400 rounded-lg transition-colors">
                                                 <Check className="w-4 h-4" />
@@ -120,7 +155,7 @@ export default async function AttendeesPage({ params }: { params: Promise<{ id: 
                             ))}
                             {(!attendees || attendees.length === 0) && (
                                 <tr>
-                                    <td colSpan={4} className="p-8 text-center text-gray-500">
+                                    <td colSpan={5} className="p-8 text-center text-gray-500">
                                         No attendees found for this event.
                                     </td>
                                 </tr>

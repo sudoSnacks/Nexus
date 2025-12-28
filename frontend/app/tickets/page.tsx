@@ -54,7 +54,7 @@ export default async function MyTicketsPage() {
                         <Ticket className="w-16 h-16 text-gray-600 mb-4" />
                         <h3 className="text-xl font-semibold text-gray-300 mb-2">No tickets found</h3>
                         <p className="text-gray-500 mb-6">You haven't registered for any events yet.</p>
-                        <Link href="/events" className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg transition-colors font-medium">
+                        <Link href="/events" className="bg-white/10 hover:bg-white/20 border border-white/10 text-white px-6 py-3 rounded-lg backdrop-blur-md transition-all font-medium hover:shadow-lg hover:shadow-white/10">
                             Browse Events
                         </Link>
                     </div>

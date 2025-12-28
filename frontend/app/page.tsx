@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
 import { ArrowRight, Sparkles, Zap, Globe, Mail, Code, User, Send, Instagram, Linkedin } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import clsx from "clsx";
 
 export default function LandingPage() {
@@ -16,6 +16,14 @@ export default function LandingPage() {
   const smoothX = useSpring(x, { damping: 20, stiffness: 90 });
 
   const [activeSection, setActiveSection] = useState("home");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Update active section based on scroll
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
@@ -39,7 +47,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div ref={containerRef} className="h-[300vh] bg-black text-white font-sans selection:bg-yellow-500 selection:text-black">
+    <div ref={containerRef} className="relative min-h-screen md:h-[300vh] bg-black text-white font-sans selection:bg-yellow-500 selection:text-black">
 
       {/* Dynamic Background Gradient (Fixed) */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -54,10 +62,11 @@ export default function LandingPage() {
       {/* Fixed Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 flex justify-between items-center max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-red-500 flex items-center justify-center font-mono text-lg font-bold">O</div>
-          <span className="font-bold text-xl tracking-tight">OnCampus</span>
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-red-500 flex items-center justify-center font-mono text-lg font-bold">N</div>
+          <span className="font-bold text-xl tracking-tight">Nexus</span>
         </div>
 
+        {/* Desktop Nav */}
         <div className="hidden md:flex items-center bg-white/5 backdrop-blur-md rounded-full px-2 py-1 border border-white/10 relative">
           {[
             { id: 'home', label: 'Home', index: 0 },
@@ -84,21 +93,30 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <Link href="/events" className="group relative inline-flex items-center justify-center px-6 py-2 overflow-hidden font-bold text-white rounded-full bg-white/10 border border-white/10 hover:bg-white/20 transition-all duration-300">
+        <Link href="/events" className="hidden md:inline-flex group relative items-center justify-center px-6 py-2 overflow-hidden font-bold text-white rounded-full bg-white/10 border border-white/10 hover:bg-white/20 transition-all duration-300">
           <span className="mr-2">View Events</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </Link>
+
+        {/* Mobile Menu Toggle - Simplified for now, can be expanded to a full sheet if needed */}
+        <div className="md:hidden">
+          {/* Creating a simple mobile menu using standard Next.js/React patterns would require more state. 
+                For this quick refactor, I'll auto-stack sections so scrolling works naturally.
+                Nav links could just scroll to view.
+             */}
+          <Link href="/events" className="p-2 text-sm bg-white/10 rounded-lg">Events</Link>
+        </div>
       </nav>
 
-      {/* Horizontal Scroll Container */}
-      <div className="sticky top-0 h-screen overflow-hidden flex items-center">
+      {/* Scroll Container - Horizontal on Desktop, Vertical on Mobile */}
+      <div className="relative md:sticky top-0 h-auto md:h-screen overflow-hidden flex flex-col md:flex-row items-center">
         <motion.div
-          style={{ x: smoothX }}
-          className="flex h-full w-[300vw]"
+          style={isMobile ? {} : { x: smoothX }}
+          className="flex flex-col md:flex-row h-full w-full md:w-[300vw]"
         >
 
           {/* SECTION 1: HOME */}
-          <section className="w-screen h-screen flex flex-col justify-center items-center px-4 relative">
+          <section className="w-full md:w-screen h-screen flex flex-col justify-center items-center px-4 relative shrink-0">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -110,7 +128,7 @@ export default function LandingPage() {
               </div>
               <h1 className="text-7xl md:text-9xl font-bold tracking-tighter leading-none">
                 GDG <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-red-400 to-green-400">OnCampus</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-red-400 to-green-400">Nexus</span>
               </h1>
               <p className="text-xl text-gray-400 max-w-2xl mx-auto">
                 Scroll down to explore deeper. A horizontal journey through our world.
@@ -122,7 +140,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 1 }}
-              className="absolute bottom-12 left-8 md:left-12"
+              className="absolute bottom-12 left-8 md:left-12 hidden md:block"
             >
               <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-white/10 border border-white/10 backdrop-blur-md shadow-lg shadow-black/10">
                 <span className="font-mono text-xs uppercase tracking-widest text-white/80">Scroll to explore</span>
@@ -138,7 +156,7 @@ export default function LandingPage() {
           </section>
 
           {/* SECTION 2: ABOUT */}
-          <section className="w-screen h-screen flex items-center px-8 md:px-32 relative">
+          <section className="w-full md:w-screen min-h-screen flex items-center px-8 md:px-32 relative shrink-0 py-20 md:py-0">
             <div className="border-l border-white/10 pl-8 md:pl-20 max-w-4xl">
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
@@ -180,7 +198,7 @@ export default function LandingPage() {
           </section>
 
           {/* SECTION 3: CONTACT */}
-          <section className="w-screen h-screen flex items-center justify-center px-4 relative">
+          <section className="w-full md:w-screen min-h-screen flex items-center justify-center px-4 relative shrink-0 py-20 md:py-0">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
