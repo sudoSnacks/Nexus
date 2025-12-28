@@ -54,9 +54,29 @@ export async function getAttendee(id: string) {
 
 export async function checkInAttendee(id: string) {
     const supabase = await createClient();
+
+    // Concurrency Check: Verify status first
+    const { data: attendee, error: fetchError } = await supabase
+        .from('attendees')
+        .select('checked_in, name')
+        .eq('id', id)
+        .single();
+
+    if (fetchError || !attendee) {
+        throw new Error("Attendee not found or scan failed");
+    }
+
+    if (attendee.checked_in) {
+        // Critical: Return specific object that client can handle
+        return { success: false, error: `Already checked in! (${attendee.name})` };
+    }
+
     const { error } = await supabase
         .from('attendees')
-        .update({ checked_in: true })
+        .update({
+            checked_in: true,
+            checked_in_at: new Date().toISOString()
+        })
         .eq('id', id);
 
     if (error) {

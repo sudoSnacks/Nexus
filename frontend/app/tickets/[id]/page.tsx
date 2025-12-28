@@ -3,8 +3,9 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import QRCode from "react-qr-code";
-import { Calendar, MapPin, Ticket, X, User, Mail, CreditCard, Clock } from "lucide-react";
+import { Calendar, MapPin, Ticket, X, User, Mail, CreditCard, Clock, Download } from "lucide-react";
 import BackgroundGradient from "@/components/BackgroundGradient";
+import AddToCalendar from "@/components/AddToCalendar";
 
 export default async function TicketPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -95,6 +96,26 @@ export default async function TicketPage({ params }: { params: Promise<{ id: str
                         <p className="text-xs text-center text-gray-500 font-mono">
                             ID: {attendee.id.slice(0, 8)}...
                         </p>
+                    </div>
+                </div>
+
+                {/* Actions */}
+                <div className="p-6 bg-white/5 border-t border-white/5 flex flex-col gap-3">
+                    <div className="flex gap-2 justify-center">
+                        <AddToCalendar event={{
+                            title: event.name,
+                            description: `Ticket for ${event.name}`,
+                            location: event.location,
+                            date: event.date // ISO string
+                        }} />
+
+                        <a
+                            href={`/api/tickets/${attendee.id}/pdf`}
+                            className="flex items-center gap-2 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 text-indigo-100 px-4 py-2 rounded-lg transition-all text-sm font-medium"
+                        >
+                            <Download className="w-4 h-4" />
+                            Download PDF
+                        </a>
                     </div>
                 </div>
 

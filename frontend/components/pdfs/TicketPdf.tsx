@@ -70,6 +70,7 @@ interface TicketProps {
         date: string;
         location: string;
         organizer: string;
+        logoUrl?: string;
     };
     attendeeDetails: {
         name: string;
@@ -85,14 +86,55 @@ export const TicketPdf = ({ eventDetails, attendeeDetails, qrCodeUrl }: TicketPr
     <Document>
         <Page size="A4" style={styles.page}>
 
-            {/* Header Row: Booking Details (Left) + QR Code (Right) */}
-            <View style={styles.headerRow}>
-                <View style={styles.headerLeft}>
-                    <Text style={styles.headerText}>Booking Date: {attendeeDetails.bookingDate}</Text>
-                    <Text style={styles.headerText}>Booking ID: {attendeeDetails.bookingId}</Text>
+            {/* Header: Logo (Left) vs QR Code (Right) */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
+                {/* Large Logo Area - roughly 60% width */}
+                <View style={{ width: '60%' }}>
+                    {eventDetails.logoUrl ? (
+                        <Image
+                            src={eventDetails.logoUrl}
+                            style={{
+                                width: 250,
+                                height: 120,
+                                objectFit: 'contain',
+                                alignSelf: 'flex-start'
+                            }}
+                        />
+                    ) : (
+                        <View style={{ height: 120, justifyContent: 'center' }}>
+                            <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#4f46e5' }}>
+                                {eventDetails.name}
+                            </Text>
+                        </View>
+                    )}
                 </View>
-                <View style={styles.headerRight}>
-                    <Image src={qrCodeUrl} style={styles.qrCode} />
+
+                {/* QR Code Area */}
+                <View style={{ width: 120, height: 120 }}>
+                    <Image src={qrCodeUrl} style={{ width: '100%', height: '100%' }} />
+                </View>
+            </View>
+
+            {/* Event Name & Date (Below Header) */}
+            <View style={{ marginBottom: 30 }}>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 5 }}>
+                    {eventDetails.name}
+                </Text>
+                <Text style={{ fontSize: 12, color: '#666' }}>
+                    {eventDetails.date}
+                </Text>
+            </View>
+
+            {/* Booking Details */}
+            <View style={{ marginBottom: 20 }}>
+                <Text style={styles.sectionTitle}>Booking Information</Text>
+                <View style={styles.row}>
+                    <Text style={styles.label}>Booking ID:</Text>
+                    <Text style={styles.value}>{attendeeDetails.bookingId}</Text>
+                </View>
+                <View style={styles.row}>
+                    <Text style={styles.label}>Date:</Text>
+                    <Text style={styles.value}>{attendeeDetails.bookingDate}</Text>
                 </View>
             </View>
 
@@ -107,41 +149,15 @@ export const TicketPdf = ({ eventDetails, attendeeDetails, qrCodeUrl }: TicketPr
                     <Text style={styles.label}>Email:</Text>
                     <Text style={styles.value}>{attendeeDetails.email}</Text>
                 </View>
-            </View>
-
-            {/* Event Details */}
-            <View>
-                <Text style={styles.sectionTitle}>Event Details</Text>
-
                 <View style={styles.row}>
-                    <Text style={styles.label}>Event Name:</Text>
-                    <Text style={styles.value}>{eventDetails.name}</Text>
-                </View>
-
-                <View style={styles.row}>
-                    <Text style={styles.label}>Event Date:</Text>
-                    <Text style={styles.value}>{eventDetails.date}</Text>
-                </View>
-
-                <View style={styles.row}>
-                    <Text style={styles.label}>Ticket Name:</Text>
+                    <Text style={styles.label}>Ticket:</Text>
                     <Text style={styles.value}>{attendeeDetails.ticketType}</Text>
-                </View>
-
-                <View style={styles.row}>
-                    <Text style={styles.label}>Organiser Name:</Text>
-                    <Text style={styles.value}>{eventDetails.organizer}</Text>
-                </View>
-
-                <View style={styles.row}>
-                    <Text style={styles.label}>Location:</Text>
-                    <Text style={styles.value}>{eventDetails.location}</Text>
                 </View>
             </View>
 
             {/* Footer */}
             <View style={styles.footer}>
-                <Text>Powered by GDG Nexus</Text>
+                <Text>Presented by {eventDetails.organizer}</Text>
             </View>
 
         </Page>

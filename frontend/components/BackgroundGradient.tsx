@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useMotionValue, useSpring, motion } from "framer-motion";
 
-export default function BackgroundGradient() {
+export default function BackgroundGradient({ primaryColor = "#4f46e5" }: { primaryColor?: string }) {
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
 
@@ -32,10 +32,18 @@ export default function BackgroundGradient() {
                 className="absolute inset-0"
             >
                 {/* Interactive Gradient Mesh - matching the Orange/Blue/Purple reference */}
-                <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] opacity-60 blur-[100px] bg-[conic-gradient(from_0deg_at_50%_50%,#0F172A_0deg,#3B82F6_50deg,#D97706_100deg,#8B5CF6_180deg,#3B82F6_270deg,#0F172A_360deg)] animate-spin-slow" />
+                <div
+                    className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] opacity-60 blur-[100px] animate-spin-slow"
+                    style={{
+                        background: `conic-gradient(from 0deg at 50% 50%, #0F172A 0deg, ${primaryColor} 50deg, #D97706 100deg, #8B5CF6 180deg, ${primaryColor} 270deg, #0F172A 360deg)`
+                    }}
+                />
 
                 {/* Secondary accent blob for depth */}
-                <div className="absolute top-[20%] right-[20%] w-[50vh] h-[50vh] bg-orange-600/30 rounded-full blur-[120px]" />
+                <div
+                    className="absolute top-[20%] right-[20%] w-[50vh] h-[50vh] rounded-full blur-[120px]"
+                    style={{ backgroundColor: `color-mix(in srgb, ${primaryColor}, transparent 70%)` }}
+                />
                 <div className="absolute bottom-[20%] left-[20%] w-[50vh] h-[50vh] bg-blue-600/30 rounded-full blur-[120px]" />
             </motion.div>
 

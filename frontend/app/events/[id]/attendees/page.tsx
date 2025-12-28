@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Check, X, Mail, CheckCircle, Edit, Trash2, Award, QrCode, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Check, X, Mail, CheckCircle, Edit, Trash2, Award, QrCode, RefreshCw, BarChart } from 'lucide-react'
 import { updateAttendeeStatus, confirmAllAttendees } from '../../actions'
 import { resendAttendeeEmail } from '@/actions/email'
 import { isAdmin } from '@/utils/roles'
@@ -57,6 +57,10 @@ export default async function AttendeesPage({ params }: { params: Promise<{ id: 
                                         Confirm All
                                     </button>
                                 </form>
+                                <Link href={`/events/${id}/analytics`} className="flex items-center justify-center gap-2 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 text-orange-100 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
+                                    <BarChart className="w-4 h-4" />
+                                    Analytics
+                                </Link>
                                 <Link href={`/events/${id}/email`} className="flex items-center justify-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-100 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
                                     <Mail className="w-4 h-4" />
                                     Send Emails

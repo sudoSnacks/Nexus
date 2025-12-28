@@ -12,19 +12,31 @@ export async function createEvent(formData: FormData) {
     }
     const supabase = await createClient()
 
+    const name = formData.get('name') as string
+    const date = formData.get('date') as string
+    const location = formData.get('location') as string
+
     const data = {
-        name: formData.get('name') as string,
-        date: formData.get('date') as string,
-        location: formData.get('location') as string,
+        name,
+        date,
+        location,
         capacity: formData.get('capacity') ? parseInt(formData.get('capacity') as string) : null,
         requires_approval: formData.get('requires_approval') === 'on',
+        // New Fields
+        primary_color: formData.get('primary_color') as string,
+        logo_url: formData.get('logo_url') as string,
+        gallery_images: JSON.parse((formData.get('gallery_images') as string) || '[]'),
+
+        // Manual input mapped to schema columns
+        ai_summary: formData.get('ai_summary_text') as string,
+        ai_key_times: JSON.parse((formData.get('ai_key_times_json') as string) || '[]'),
     }
 
     const { error } = await supabase.from('events').insert(data)
 
     if (error) {
         console.error('Error creating event:', error)
-        redirect('/error')
+        redirect('/error?message=Failed to create event')
     }
 
     revalidatePath('/events', 'layout')
@@ -44,6 +56,13 @@ export async function updateEvent(formData: FormData) {
         location: formData.get('location') as string,
         capacity: formData.get('capacity') ? parseInt(formData.get('capacity') as string) : null,
         requires_approval: formData.get('requires_approval') === 'on',
+        // Update new fields
+        primary_color: formData.get('primary_color') as string,
+        logo_url: formData.get('logo_url') as string,
+        gallery_images: JSON.parse((formData.get('gallery_images') as string) || '[]'),
+        // Manual inputs
+        ai_summary: formData.get('ai_summary_text') as string,
+        ai_key_times: JSON.parse((formData.get('ai_key_times_json') as string) || '[]')
     }
 
     const { error } = await supabase.from('events').update(data).eq('id', id)
