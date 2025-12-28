@@ -94,14 +94,20 @@ export default async function HelpersPage({ searchParams }: { searchParams: Prom
                                         {profile.role !== 'admin' && (
                                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 {profile.role === 'user' ? (
-                                                    <form action={updateUserRole.bind(null, profile.id, 'helper')}>
+                                                    <form action={async () => {
+                                                        "use server";
+                                                        await updateUserRole(profile.id, 'helper');
+                                                    }}>
                                                         <button className="flex items-center gap-2 bg-purple-600/20 hover:bg-purple-600/40 text-purple-200 px-3 py-1.5 rounded-md text-sm transition-colors border border-purple-500/30">
                                                             <UserPlus className="w-3 h-3" />
                                                             Promote to Helper
                                                         </button>
                                                     </form>
                                                 ) : (
-                                                    <form action={updateUserRole.bind(null, profile.id, 'user')}>
+                                                    <form action={async () => {
+                                                        "use server";
+                                                        await updateUserRole(profile.id, 'user');
+                                                    }}>
                                                         <button className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-200 px-3 py-1.5 rounded-md text-sm transition-colors border border-red-500/20">
                                                             <UserMinus className="w-3 h-3" />
                                                             Demote to User
