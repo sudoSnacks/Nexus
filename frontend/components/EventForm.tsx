@@ -26,7 +26,6 @@ interface EventFormProps {
 export default function EventForm({ mode, initialData, action }: EventFormProps) {
     const [logoUrl, setLogoUrl] = useState(initialData?.logo_url || '');
     const [galleryUrls, setGalleryUrls] = useState<string[]>(initialData?.gallery_images || []);
-    const [primaryColor, setPrimaryColor] = useState(initialData?.primary_color || '#4f46e5');
 
     const [formData, setFormData] = useState({
         name: initialData?.name || '',
@@ -45,9 +44,9 @@ export default function EventForm({ mode, initialData, action }: EventFormProps)
             {mode === 'edit' && <input type="hidden" name="id" value={initialData?.id} />}
 
             {/* Hidden Inputs for Client state */}
+            {/* Hidden Inputs for Client state */}
             <input type="hidden" name="logo_url" value={logoUrl} />
             <input type="hidden" name="gallery_images" value={JSON.stringify(galleryUrls)} />
-            <input type="hidden" name="primary_color" value={primaryColor} />
             <input type="hidden" name="ai_summary_text" value={aiBlurb} />
             <input type="hidden" name="ai_key_times_json" value={JSON.stringify(aiKeyDetails)} />
             <input type="hidden" name="requires_approval" value={formData.requires_approval ? "on" : "off"} />
@@ -152,39 +151,45 @@ export default function EventForm({ mode, initialData, action }: EventFormProps)
                 </div>
 
                 {/* Branding */}
-                <div className="bg-white/5 p-4 rounded-xl border border-white/5 space-y-4">
+                <div className="bg-white/5 p-6 rounded-xl border border-white/5 space-y-6">
                     <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">Branding & Visuals</h3>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">Event Logo</label>
-                            <ImageUpload onUpload={setLogoUrl} folder="logos" />
+                    <div className="space-y-4">
+                        <label className="block text-sm font-medium text-gray-400">Event Logo</label>
+                        <div className="flex items-start gap-4">
+                            {/* Upload Button - Small Square */}
+                            <div className="w-24 h-24">
+                                <ImageUpload
+                                    onUpload={setLogoUrl}
+                                    folder="logos"
+                                    label="Upload"
+                                    className="h-full"
+                                    compact={true} // Passing a new prop for compact styling
+                                />
+                            </div>
+
+                            {/* Preview Thumbnail */}
                             {logoUrl && (
-                                <div className="mt-2 w-16 h-16 relative rounded-lg overflow-hidden border border-white/10">
+                                <div className="w-24 h-24 relative rounded-lg overflow-hidden border border-white/10 shrink-0">
                                     <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                                    <button
+                                        type="button"
+                                        onClick={() => setLogoUrl('')}
+                                        className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 flex items-center justify-center transition-all text-red-400"
+                                    >
+                                        <Trash2 className="w-5 h-5" />
+                                    </button>
                                 </div>
                             )}
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">Primary Theme Color</label>
-                            <div className="flex items-center gap-3">
-                                <input
-                                    type="color"
-                                    value={primaryColor}
-                                    onChange={(e) => setPrimaryColor(e.target.value)}
-                                    className="h-10 w-20 rounded cursor-pointer bg-transparent border-0 p-0"
-                                />
-                                <span className="text-gray-400 font-mono">{primaryColor}</span>
-                            </div>
                         </div>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-2">Gallery Images (Carousel)</label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+                        <div className="flex flex-wrap gap-4">
+                            {/* Existing Images */}
                             {galleryUrls.map((url, idx) => (
-                                <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-white/10 group">
+                                <div key={idx} className="w-24 h-24 relative rounded-lg overflow-hidden border border-white/10 group shrink-0">
                                     <img src={url} alt="Gallery" className="object-cover w-full h-full" />
                                     <button
                                         type="button"
@@ -195,13 +200,17 @@ export default function EventForm({ mode, initialData, action }: EventFormProps)
                                     </button>
                                 </div>
                             ))}
-                            <ImageUpload
-                                onUpload={(url) => setGalleryUrls(prev => [...prev, url])}
-                                folder="gallery"
-                                label="Add Images"
-                                multiple={true}
-                                className=""
-                            />
+
+                            {/* Add Button - Small Square */}
+                            <div className="w-24 h-24">
+                                <ImageUpload
+                                    onUpload={(url) => setGalleryUrls(prev => [...prev, url])}
+                                    folder="gallery"
+                                    label="+"
+                                    multiple={true}
+                                    compact={true}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

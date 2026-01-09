@@ -23,7 +23,6 @@ export async function createEvent(formData: FormData) {
         capacity: formData.get('capacity') ? parseInt(formData.get('capacity') as string) : null,
         requires_approval: formData.get('requires_approval') === 'on',
         // New Fields
-        primary_color: formData.get('primary_color') as string,
         logo_url: formData.get('logo_url') as string,
         gallery_images: JSON.parse((formData.get('gallery_images') as string) || '[]'),
 
@@ -57,7 +56,6 @@ export async function updateEvent(formData: FormData) {
         capacity: formData.get('capacity') ? parseInt(formData.get('capacity') as string) : null,
         requires_approval: formData.get('requires_approval') === 'on',
         // Update new fields
-        primary_color: formData.get('primary_color') as string,
         logo_url: formData.get('logo_url') as string,
         gallery_images: JSON.parse((formData.get('gallery_images') as string) || '[]'),
         // Manual inputs

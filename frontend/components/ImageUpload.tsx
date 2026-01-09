@@ -11,9 +11,10 @@ interface ImageUploadProps {
     folder?: string;
     className?: string;
     multiple?: boolean;
+    compact?: boolean;
 }
 
-export default function ImageUpload({ onUpload, label = "Upload Image", folder = "events", className = "", multiple = false }: ImageUploadProps) {
+export default function ImageUpload({ onUpload, label = "Upload Image", folder = "events", className = "", multiple = false, compact = false }: ImageUploadProps) {
     const [uploading, setUploading] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
 
@@ -42,8 +43,8 @@ export default function ImageUpload({ onUpload, label = "Upload Image", folder =
                 const result = await uploadImage(formData);
 
                 if (result.success && result.url) {
-                    // For single mode, set local preview
-                    if (!multiple) {
+                    // For single mode, set local preview if NOT compact (compact mode relies on parent to show preview usually, or we show a small one)
+                    if (!multiple && !compact) {
                         setPreview(result.url);
                     }
                     onUpload(result.url);
@@ -61,6 +62,35 @@ export default function ImageUpload({ onUpload, label = "Upload Image", folder =
         // Reset input
         e.target.value = '';
     };
+
+    if (compact) {
+        return (
+            <label className={`flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:bg-white/5 hover:border-white/40 transition-all group ${className}`}>
+                <div className="flex flex-col items-center justify-center text-center p-1">
+                    {uploading ? (
+                        <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+                    ) : (
+                        <Upload className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
+                    )}
+                    {/* Only show label if provided and not strictly just an icon */}
+                    {label && label !== "+" ? (
+                        <span className="text-[10px] text-gray-400 mt-1 leading-tight">{label}</span>
+                    ) : null}
+                    {label === "+" && (
+                        <span className="text-xl text-gray-400 group-hover:text-white transition-colors mt-[-4px]">+</span>
+                    )}
+                </div>
+                <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    multiple={multiple}
+                    onChange={handleFileChange}
+                    disabled={uploading}
+                />
+            </label>
+        );
+    }
 
     return (
         <div className={`space-y-2 ${className}`}>
