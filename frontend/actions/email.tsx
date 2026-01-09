@@ -104,7 +104,7 @@ export async function sendDidYouGetInEmail(
             return { success: true, data };
         }
     } catch (error) {
-        console.error("Failed to send email:", error);
+        console.error(`[sendDidYouGetInEmail] Critical error sending to ${userEmail}:`, error);
         return { success: false, error };
     }
 }
@@ -139,6 +139,13 @@ export async function sendCertificateEmail(
 }
 
 export async function sendBatchEmails(eventId: string) {
+    console.log(`[sendBatchEmails] Starting batch email send for event: ${eventId}`);
+
+    if (!process.env.RESEND_API_KEY) {
+        console.error("[sendBatchEmails] RESEND_API_KEY is missing in environment variables");
+        return { success: false, error: "RESEND_API_KEY is missing" };
+    }
+
     const supabase = await createClient();
 
     // Fetch event details
@@ -153,8 +160,11 @@ export async function sendBatchEmails(eventId: string) {
         .eq('email_sent', false);
 
     if (!attendees || attendees.length === 0) {
+        console.log(`[sendBatchEmails] No pending emails found for event ${eventId}`);
         return { success: true, message: "No pending emails to send." };
     }
+
+    console.log(`[sendBatchEmails] Found ${attendees.length} pending attendees`);
 
     let sentCount = 0;
     let errorCount = 0;
@@ -182,14 +192,17 @@ export async function sendBatchEmails(eventId: string) {
             // Update email_sent flag
             await supabase.from('attendees').update({ email_sent: true }).eq('id', attendee.id);
             sentCount++;
+            console.log(`[sendBatchEmails] Successfully sent email to ${attendee.email}`);
         } else {
             errorCount++;
+            console.error(`[sendBatchEmails] Failed to send email to ${attendee.email}`, result?.error);
         }
 
         // Simple delay to avoid rate limits
         await new Promise(resolve => setTimeout(resolve, 500));
     }
 
+    console.log(`[sendBatchEmails] Completed. Sent: ${sentCount}, Errors: ${errorCount}`);
     return { success: true, sentCount, errorCount };
 }
 

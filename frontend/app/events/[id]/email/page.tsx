@@ -22,7 +22,9 @@ export default async function BatchEmailPage({ params }: { params: Promise<{ id:
 
     async function handleSend() {
         "use server";
-        await sendBatchEmails(id);
+        console.log("Starting handleSend action...");
+        const result = await sendBatchEmails(id);
+        console.log("Batch email result:", result);
         redirect(`/events/${id}/attendees?message=Batch processing started`);
     }
 

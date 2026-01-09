@@ -16,6 +16,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { action, eventId, attendeeId } = body;
 
+    console.log(`[API/send-ticket] Received request: action=${action}, eventId=${eventId}, attendeeId=${attendeeId}`);
+
     if (!eventId) {
       return NextResponse.json({ error: 'Event ID is required' }, { status: 400 });
     }
@@ -29,7 +31,7 @@ export async function POST(request: Request) {
         .select('*, events(*)')
         .eq('id', attendeeId)
         .single();
-      
+
       if (error || !data) throw new Error('Attendee not found');
       attendeesToProcess = [data];
     } else if (action === 'batch') {
@@ -39,7 +41,7 @@ export async function POST(request: Request) {
         .eq('event_id', eventId)
         .eq('status', 'confirmed') // Only confirmed attendees
         .eq('email_sent', false);  // Only those who haven't received it
-      
+
       if (error) throw new Error('Error fetching attendees');
       attendeesToProcess = data || [];
     } else {
@@ -80,28 +82,34 @@ export async function POST(request: Request) {
         `,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error(`[API/send-ticket] Failed to send to ${attendee.email}:`, error);
+        throw error;
+      }
+
+      console.log(`[API/send-ticket] Successfully sent to ${attendee.email}`);
 
       // Update status
       await supabase
         .from('attendees')
         .update({ email_sent: true })
         .eq('id', attendee.id);
-      
+
       return attendee.id;
     }));
 
     const successCount = results.filter(r => r.status === 'fulfilled').length;
     const failureCount = results.filter(r => r.status === 'rejected').length;
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       processed: attendeesToProcess.length,
       sent: successCount,
       failed: failureCount
     });
 
   } catch (error: any) {
+    console.error("[API/send-ticket] Global error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
