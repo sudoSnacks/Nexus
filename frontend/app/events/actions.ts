@@ -20,13 +20,14 @@ export async function createEvent(formData: FormData) {
         name,
         date,
         location,
-        capacity: formData.get('capacity') ? parseInt(formData.get('capacity') as string) : null,
+        capacity: (formData.get('capacity') && !isNaN(parseInt(formData.get('capacity') as string)))
+            ? parseInt(formData.get('capacity') as string)
+            : null,
         requires_approval: formData.get('requires_approval') === 'on',
+        is_registration_closed: formData.get('is_registration_closed') === 'on',
         // New Fields
         logo_url: formData.get('logo_url') as string,
         gallery_images: JSON.parse((formData.get('gallery_images') as string) || '[]'),
-
-        // Manual input mapped to schema columns
         ai_summary: formData.get('ai_summary_text') as string,
         ai_key_times: JSON.parse((formData.get('ai_key_times_json') as string) || '[]'),
     }
@@ -55,12 +56,13 @@ export async function updateEvent(formData: FormData) {
         location: formData.get('location') as string,
         capacity: formData.get('capacity') ? parseInt(formData.get('capacity') as string) : null,
         requires_approval: formData.get('requires_approval') === 'on',
-        // Update new fields
+        is_registration_closed: formData.get('is_registration_closed') === 'on',
+        // New Fields
         logo_url: formData.get('logo_url') as string,
         gallery_images: JSON.parse((formData.get('gallery_images') as string) || '[]'),
         // Manual inputs
         ai_summary: formData.get('ai_summary_text') as string,
-        ai_key_times: JSON.parse((formData.get('ai_key_times_json') as string) || '[]')
+        ai_key_times: JSON.parse((formData.get('ai_key_times_json') as string) || '[]'),
     }
 
     const { error } = await supabase.from('events').update(data).eq('id', id)
@@ -80,7 +82,20 @@ export async function deleteEvent(id: string) {
     }
     const supabase = await createClient()
 
-    // Constraint: Cascade delete on schema handles attendees
+    // 1. Fetch Event Details (Name) and Current User
+    const { data: event } = await supabase.from('events').select('name').eq('id', id).single()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (event && user) {
+        // 2. Log Deletion
+        await supabase.from('event_deletion_logs').insert({
+            deleter_user_id: user.id,
+            deleter_email: user.email,
+            event_name: event.name || 'Unknown Event',
+        })
+    }
+
+    // 3. Delete Event (Cascade delete handles attendees)
     const { error } = await supabase.from('events').delete().eq('id', id)
 
     if (error) {
@@ -100,13 +115,24 @@ export async function registerAttendee(formData: FormData) {
     const email = formData.get('email') as string
 
     // 1. Fetch Event Details
-    const { data: event, error: eventError } = await supabase.from('events').select('capacity, requires_approval').eq('id', event_id).single()
+    const { data: event, error: eventError } = await supabase.from('events').select('capacity, requires_approval, is_registration_closed').eq('id', event_id).single()
 
     if (eventError || !event) {
         redirect('/error?message=Event not found')
     }
 
-    // 2. Check Capacity
+    if (event.is_registration_closed) {
+        redirect(`/events/${event_id}/register?error=Registration is closed`)
+    }
+
+    // 2. Check for Duplicate Registration
+    const { data: existingAttendee } = await supabase.from('attendees').select('id').eq('event_id', event_id).eq('email', email).single()
+
+    if (existingAttendee) {
+        redirect(`/events/${event_id}/register?error=Email already registered`)
+    }
+
+    // 3. Check Capacity
     if (event.capacity) {
         const { count, error: countError } = await supabase.from('attendees').select('*', { count: 'exact', head: true }).eq('event_id', event_id)
 
@@ -123,11 +149,16 @@ export async function registerAttendee(formData: FormData) {
     // 3. Determine Status
     const status = event.requires_approval ? 'pending' : 'confirmed'
 
+    // Parse custom answers
+    // Parse custom answers - REMOVED
+    const registration_answers: Record<string, any> = {};
+
     const data = {
         event_id,
         name,
         email,
-        status
+        status,
+        registration_answers
     }
 
     const { data: attendee, error } = await supabase.from('attendees').insert(data).select().single()

@@ -6,6 +6,9 @@ create table if not exists public.profiles (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Note: is_registration_closed column added to events table via manual migration
+-- alter table public.events add column is_registration_closed boolean default false;
+
 -- 2. Enable Row Level Security (RLS)
 alter table public.profiles enable row level security;
 

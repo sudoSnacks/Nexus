@@ -17,7 +17,10 @@ export const metadata: Metadata = {
   description: "Join GDG Nexus - A community for developers to learn, connect, and grow.",
 };
 
-import { Analytics } from "@vercel/analytics/react"
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import GlobalBackground from "@/components/GlobalBackground";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function RootLayout({
   children,
@@ -25,12 +28,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <Analytics />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          themes={["light", "dark", "rainbow"]}
+        >
+          <GlobalBackground />
+          <ThemeToggle />
+          {children}
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );

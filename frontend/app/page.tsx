@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
-import { ArrowRight, Sparkles, Zap, Globe, Mail, Code, User, Send, Instagram, Linkedin } from "lucide-react";
+import { ArrowRight, Sparkles, Zap, Globe, Code, User, Send, Instagram, Linkedin } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import clsx from "clsx";
+import FluidBackground from "@/components/FluidBackground";
+import FluidBackgroundBlack from "@/components/FluidBackgroundBlack";
+import { useTheme } from "next-themes";
 
 export default function LandingPage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -17,8 +20,11 @@ export default function LandingPage() {
 
   const [activeSection, setActiveSection] = useState("home");
   const [isMobile, setIsMobile] = useState(false);
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -46,28 +52,26 @@ export default function LandingPage() {
     });
   };
 
+  /* 
+   * FIX: Removed 'if (!mounted) return null;' 
+   * This ensures the containerRef is always attached to the DOM, 
+   * preventing Framer Motion's useScroll from crashing with "Target ref is defined but not hydrated".
+   */
+
+  const isDark = mounted && (theme === "dark" || theme === "rainbow");
+
   return (
-    <div ref={containerRef} className="relative min-h-screen md:h-[300vh] bg-black text-white font-sans selection:bg-yellow-500 selection:text-black">
-
-      {/* Dynamic Background Gradient (Fixed) */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        {/* Blue Red Green Yellow Gradient Mesh */}
-        <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-[conic-gradient(from_0deg_at_50%_50%,#3B82F6_0deg,#EF4444_90deg,#22C55E_180deg,#EAB308_270deg,#3B82F6_360deg)] opacity-30 blur-[120px] animate-spin-slow" />
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-3xl" />
-
-        {/* Subtle noise texture overlay */}
-        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-      </div>
+    <div ref={containerRef} className="relative min-h-screen md:h-[300vh] bg-transparent text-foreground font-sans selection:bg-blue-500 selection:text-white transition-colors duration-500">
 
       {/* Fixed Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 flex justify-between items-center max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-red-500 flex items-center justify-center font-mono text-lg font-bold">N</div>
-          <span className="font-bold text-xl tracking-tight">Nexus</span>
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center font-mono text-lg font-bold text-white">N</div>
+          <span className="font-bold text-xl tracking-tight text-foreground">Nexus</span>
         </div>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center bg-white/5 backdrop-blur-md rounded-full px-2 py-1 border border-white/10 relative">
+        <div className="hidden md:flex items-center bg-background/60 backdrop-blur-md rounded-full px-2 py-1 border border-foreground/5 relative shadow-sm transition-colors duration-300">
           {[
             { id: 'home', label: 'Home', index: 0 },
             { id: 'about', label: 'About', index: 1 },
@@ -78,14 +82,14 @@ export default function LandingPage() {
               onClick={() => scrollToSection(item.index)}
               className={clsx(
                 "px-6 py-2 rounded-full text-sm font-medium transition-colors relative z-10",
-                activeSection === item.id ? "text-black" : "text-gray-400 hover:text-white"
+                activeSection === item.id ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
               {item.label}
               {activeSection === item.id && (
                 <motion.div
                   layoutId="active-nav"
-                  className="absolute inset-0 bg-white rounded-full -z-10"
+                  className="absolute inset-0 bg-muted rounded-full -z-10"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
@@ -93,22 +97,18 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <Link href="/events" className="hidden md:inline-flex group relative items-center justify-center px-6 py-2 overflow-hidden font-bold text-white rounded-full bg-white/10 border border-white/10 hover:bg-white/20 transition-all duration-300">
+        <Link href="/events" className="hidden md:inline-flex group relative items-center justify-center px-6 py-2 overflow-hidden font-bold text-background rounded-full bg-foreground border border-foreground hover:opacity-90 transition-all duration-300">
           <span className="mr-2">View Events</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </Link>
 
-        {/* Mobile Menu Toggle - Simplified for now, can be expanded to a full sheet if needed */}
+        {/* Mobile Menu Toggle */}
         <div className="md:hidden">
-          {/* Creating a simple mobile menu using standard Next.js/React patterns would require more state. 
-                For this quick refactor, I'll auto-stack sections so scrolling works naturally.
-                Nav links could just scroll to view.
-             */}
-          <Link href="/events" className="p-2 text-sm bg-white/10 rounded-lg">Events</Link>
+          <Link href="/events" className="p-2 text-sm bg-foreground/5 rounded-lg text-foreground">Events</Link>
         </div>
       </nav>
 
-      {/* Scroll Container - Horizontal on Desktop, Vertical on Mobile */}
+      {/* Scroll Container */}
       <div className="relative md:sticky top-0 h-auto md:h-screen overflow-hidden flex flex-col md:flex-row items-center">
         <motion.div
           style={isMobile ? {} : { x: smoothX }}
@@ -123,14 +123,27 @@ export default function LandingPage() {
               transition={{ duration: 0.8 }}
               className="text-center max-w-5xl space-y-6"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-medium text-blue-300 tracking-wide uppercase mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-medium text-blue-500 dark:text-blue-400 tracking-wide uppercase mb-4">
                 <Sparkles className="w-3 h-3" /> Digital Experience
               </div>
+
               <h1 className="text-7xl md:text-9xl font-bold tracking-tighter leading-none">
-                GDG <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-red-400 to-green-400">Nexus</span>
+                <span className={clsx(
+                  "transition-colors duration-1000 ease-in-out",
+                  (mounted && theme === "rainbow") ? "text-white" :
+                    (mounted && theme === "dark") ? "text-[#4A70A9]" : "text-gray-600"
+                )}>GDG</span> <br />
+                <span className={clsx(
+                  "transition-all duration-1000 ease-in-out",
+                  (mounted && theme === "rainbow") ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-red-400 to-green-400" :
+                    (mounted && theme === "dark") ? "text-[#EFECE3]" : "text-gray-100 mix-blend-difference"
+                )}>Nexus</span>
               </h1>
-              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+
+              <p className={clsx(
+                "text-xl max-w-2xl mx-auto font-medium transition-colors duration-500",
+                (mounted && theme === "dark") ? "text-[#FFE8DB]" : "text-muted-foreground"
+              )}>
                 Scroll down to explore deeper. A horizontal journey through our world.
               </p>
             </motion.div>
@@ -142,13 +155,13 @@ export default function LandingPage() {
               transition={{ delay: 1, duration: 1 }}
               className="absolute bottom-12 left-8 md:left-12 hidden md:block"
             >
-              <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-white/10 border border-white/10 backdrop-blur-md shadow-lg shadow-black/10">
-                <span className="font-mono text-xs uppercase tracking-widest text-white/80">Scroll to explore</span>
-                <div className="w-10 h-5 rounded-full border border-white/20 flex items-center p-1">
+              <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-background/40 border border-foreground/5 backdrop-blur-md shadow-lg shadow-black/5">
+                <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Scroll to explore</span>
+                <div className="w-10 h-5 rounded-full border border-foreground/10 flex items-center p-1">
                   <motion.div
                     animate={{ x: [0, 16, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-3 h-3 bg-white rounded-full shadow-sm"
+                    className="w-3 h-3 bg-foreground rounded-full shadow-sm"
                   />
                 </div>
               </div>
@@ -157,38 +170,41 @@ export default function LandingPage() {
 
           {/* SECTION 2: ABOUT */}
           <section className="w-full md:w-screen min-h-screen flex items-center px-8 md:px-32 relative shrink-0 py-20 md:py-0">
-            <div className="border-l border-white/10 pl-8 md:pl-20 max-w-4xl">
+            <div className="border-l border-foreground/10 pl-8 md:pl-20 max-w-4xl">
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 text-red-400">
+                  <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 text-red-600 dark:text-red-400">
                     <User className="w-6 h-6" />
                   </div>
-                  <span className="text-xl font-mono text-red-400">02. About</span>
+                  <span className="text-xl font-mono text-red-600 dark:text-red-400">02. About</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-red-400 to-green-400">GDGoC IET DAVV</span>
+                <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight text-foreground">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">GDGoC IET DAVV</span>
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <p className="text-lg text-gray-400 leading-relaxed">
+                  <p className={clsx(
+                    "text-lg leading-relaxed transition-colors duration-500",
+                    (mounted && theme === "dark") ? "text-[#FFE8DB]" : "text-muted-foreground"
+                  )}>
                     GDGoC IET DAVV is a part of dynamic community where students from various backgrounds come together to explore the latest in technology, learn about Google's tools and platforms, and collaborate on innovative projects.
                     <br /><br />
                     GDGoC is a place to grow as a developer, starting from a beginner developer to an advanced developer. It's not always about “programming” but also about connecting, learning together and growing together.
                   </p>
                   <div className="space-y-4">
-                    <div className="flex items-center gap-4 text-white/80">
-                      <Code className="w-5 h-5 text-blue-400" />
+                    <div className="flex items-center gap-4 text-foreground/80">
+                      <Code className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                       <span>Google Technologies</span>
                     </div>
-                    <div className="flex items-center gap-4 text-white/80">
-                      <Zap className="w-5 h-5 text-yellow-400" />
+                    <div className="flex items-center gap-4 text-foreground/80">
+                      <Zap className="w-5 h-5 text-yellow-600 dark:text-yellow-500" />
                       <span>Innovation & Growth</span>
                     </div>
-                    <div className="flex items-center gap-4 text-white/80">
-                      <Globe className="w-5 h-5 text-green-400" />
+                    <div className="flex items-center gap-4 text-foreground/80">
+                      <Globe className="w-5 h-5 text-green-600 dark:text-green-500" />
                       <span>Community & Collaboration</span>
                     </div>
                   </div>
@@ -203,17 +219,17 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="w-full max-w-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-12 rounded-3xl relative overflow-hidden"
+              className="w-full max-w-3xl bg-card backdrop-blur-xl border border-border shadow-2xl shadow-indigo-500/10 p-12 rounded-3xl relative overflow-hidden text-card-foreground"
             >
               {/* Decorative background blob */}
-              <div className="absolute -top-20 -right-20 w-64 h-64 bg-green-500/20 rounded-full blur-[80px]" />
+              <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]" />
 
               <div className="relative z-10 text-center space-y-8">
-                <div className="inline-flex justify-center items-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-green-500 to-blue-500 shadow-lg shadow-green-500/20 mb-4">
+                <div className="inline-flex justify-center items-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20 mb-4">
                   <Send className="w-8 h-8 text-white" />
                 </div>
                 <h2 className="text-4xl md:text-6xl font-bold">Contact Us</h2>
-                <p className="text-xl text-gray-400">
+                <p className="text-xl text-muted-foreground">
                   Join us in creating something GRAND
                 </p>
 
@@ -246,16 +262,6 @@ export default function LandingPage() {
 
         </motion.div>
       </div>
-
-      <style jsx global>{`
-        @keyframes spin-slow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-            animation: spin-slow 20s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }

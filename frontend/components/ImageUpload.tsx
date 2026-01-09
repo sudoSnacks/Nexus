@@ -7,7 +7,7 @@ import { uploadImage } from '@/actions/upload'; // We'll create this server acti
 
 interface ImageUploadProps {
     onUpload: (url: string) => void;
-    label?: string;
+    label?: React.ReactNode;
     folder?: string;
     className?: string;
     multiple?: boolean;
@@ -102,6 +102,7 @@ export default function ImageUpload({ onUpload, label = "Upload Image", folder =
                 <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-white/10 group">
                     <img src={preview} alt="Preview" className="w-full h-full object-cover" />
                     <button
+                        type="button"
                         onClick={(e) => {
                             e.preventDefault();
                             setPreview(null);

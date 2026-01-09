@@ -67,7 +67,7 @@ export default async function AttendeesPage({ params }: { params: Promise<{ id: 
                                 </Link>
                                 <Link href={`/events/${id}/certificates`} className="flex items-center justify-center gap-2 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/30 text-yellow-100 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
                                     <Award className="w-4 h-4" />
-                                    Send Certificates
+                                    Certificates
                                 </Link>
                                 <div className="hidden md:block h-8 w-px bg-white/10 mx-2"></div>
                                 <Link href={`/events/${id}/edit`} className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 text-gray-200 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
