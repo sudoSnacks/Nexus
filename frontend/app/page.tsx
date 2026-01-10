@@ -64,7 +64,7 @@ export default function LandingPage() {
     <div ref={containerRef} className="relative min-h-screen md:h-[300vh] bg-transparent text-foreground font-sans selection:bg-blue-500 selection:text-white transition-colors duration-500">
 
       {/* Fixed Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 flex justify-between items-center max-w-7xl mx-auto pl-24 transition-all duration-300">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 flex justify-between items-center w-full transition-all duration-300">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center font-mono text-lg font-bold text-white">N</div>
           <span className="font-bold text-xl tracking-tight text-foreground">Nexus</span>

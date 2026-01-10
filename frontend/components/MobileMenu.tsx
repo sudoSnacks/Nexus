@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
-import { Menu, X, Home, Calendar, Ticket, Shield, PlusCircle, LogOut } from 'lucide-react';
+import { Menu, X, Home, Calendar, Ticket, Shield, PlusCircle, LogOut, ChevronRight } from 'lucide-react';
 import { signout } from '@/app/auth/actions';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from "@/components/ui/button";
 
 interface MobileMenuProps {
     user: any;
@@ -13,95 +16,143 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ user, isUserAdmin, isUserHelper }: MobileMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
+    // Drawer animation variants
+    const drawerVariants = {
+        closed: { x: '-100%', opacity: 1 },
+        open: { x: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 30 } },
+    };
+
     return (
         <div className="md:hidden">
+            {/* Toggle Button */}
             <button
                 onClick={toggleMenu}
-                className="p-2 text-foreground focus:outline-none"
+                className="p-2 text-foreground focus:outline-none hover:bg-muted/20 rounded-lg transition-colors"
                 aria-label="Toggle menu"
             >
-                {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                <Menu className="w-6 h-6" />
             </button>
 
-            {isOpen && (
-                <div className="absolute top-16 right-4 z-50">
-                    {/* 
-                        Use inline styles for the complex gradient and specific colors 
-                        to match the user's request precisely where utility classes might fall short,
-                        but maps to Tailwind where possible.
-                    */}
-                    <div className="w-[200px] bg-[#242832] rounded-[10px] p-[15px_0px] flex flex-col gap-[10px] shadow-2xl border border-white/10"
-                        style={{
-                            backgroundImage: 'linear-gradient(139deg, rgba(36, 40, 50, 1) 0%, rgba(36, 40, 50, 1) 0%, rgba(37, 28, 40, 1) 100%)'
-                        }}
-                    >
+            {/* Overlay & Sidebar - Portaled to Body to avoid stacking context issues */}
+            {mounted && createPortal(
+                <AnimatePresence>
+                    {isOpen && (
+                        <>
+                            {/* Backdrop */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={toggleMenu}
+                                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
+                            />
 
-                        {/* Navigation Section */}
-                        <ul className="list-none flex flex-col gap-[8px] px-[10px]">
-                            <Link href="/">
-                                <li className="flex items-center text-[#7e8590] gap-[10px] px-[7px] py-[4px] rounded-[6px] cursor-pointer transition-all duration-300 hover:bg-[#5353ff] hover:text-white hover:translate-x-[1px] hover:-translate-y-[1px] active:scale-[0.99] group">
-                                    <Home className="w-[19px] h-[19px] transition-all duration-300 group-hover:stroke-white" />
-                                    <span className="font-semibold text-sm">Home</span>
-                                </li>
-                            </Link>
+                            {/* Sidebar Drawer */}
+                            <motion.div
+                                initial="closed"
+                                animate="open"
+                                exit="closed"
+                                variants={drawerVariants}
+                                className="fixed top-0 left-0 bottom-0 z-[9999] w-[320px] max-w-[85vw] bg-card dark:bg-zinc-950 border-r border-border shadow-2xl flex flex-col h-[100dvh]"
+                            >
+                                {/* Header */}
+                                <div className="p-6 border-b border-border flex items-center justify-between shrink-0">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg">
+                                            N
+                                        </div>
+                                        <div>
+                                            <h2 className="font-bold text-lg leading-tight">Nexus</h2>
+                                            <p className="text-xs text-muted-foreground">{user?.email}</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={toggleMenu}
+                                        className="p-2 -mr-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </div>
 
-                            <Link href="/events">
-                                <li className="flex items-center text-[#7e8590] gap-[10px] px-[7px] py-[4px] rounded-[6px] cursor-pointer transition-all duration-300 hover:bg-[#5353ff] hover:text-white hover:translate-x-[1px] hover:-translate-y-[1px] active:scale-[0.99] group">
-                                    <Calendar className="w-[19px] h-[19px] transition-all duration-300 group-hover:stroke-white" />
-                                    <span className="font-semibold text-sm">All Events</span>
-                                </li>
-                            </Link>
+                                {/* Content & Footer grouped together */}
+                                <div className="overflow-y-auto py-6 px-4 flex flex-col gap-6">
 
-                            <Link href="/tickets">
-                                <li className="flex items-center text-[#7e8590] gap-[10px] px-[7px] py-[4px] rounded-[6px] cursor-pointer transition-all duration-300 hover:bg-[#5353ff] hover:text-white hover:translate-x-[1px] hover:-translate-y-[1px] active:scale-[0.99] group">
-                                    <Ticket className="w-[19px] h-[19px] transition-all duration-300 group-hover:stroke-white" />
-                                    <span className="font-semibold text-sm">My Tickets</span>
-                                </li>
-                            </Link>
-                        </ul>
+                                    {/* Navigation Group */}
+                                    <div>
+                                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
+                                            Menu
+                                        </h3>
+                                        <ul className="flex flex-col gap-1">
+                                            <MenuItem href="/" icon={Home} label="Home" onClick={toggleMenu} />
+                                            <MenuItem href="/events" icon={Calendar} label="All Events" onClick={toggleMenu} />
+                                            <MenuItem href="/tickets" icon={Ticket} label="My Tickets" onClick={toggleMenu} />
+                                        </ul>
+                                    </div>
 
-                        <div className="border-t border-[#42434a] my-1"></div>
-
-                        {/* Admin Section */}
-                        {(isUserAdmin || isUserHelper) && (
-                            <>
-                                <ul className="list-none flex flex-col gap-[8px] px-[10px]">
-                                    {isUserAdmin && (
-                                        <Link href="/events/new">
-                                            <li className="flex items-center text-[#7e8590] gap-[10px] px-[7px] py-[4px] rounded-[6px] cursor-pointer transition-all duration-300 hover:bg-[#5353ff] hover:text-white hover:translate-x-[1px] hover:-translate-y-[1px] active:scale-[0.99] group">
-                                                <PlusCircle className="w-[19px] h-[19px] transition-all duration-300 group-hover:stroke-white" />
-                                                <span className="font-semibold text-sm">Create Event</span>
-                                            </li>
-                                        </Link>
+                                    {/* Admin Group */}
+                                    {(isUserAdmin || isUserHelper) && (
+                                        <div>
+                                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
+                                                Admin
+                                            </h3>
+                                            <ul className="flex flex-col gap-1">
+                                                {isUserAdmin && (
+                                                    <MenuItem href="/events/new" icon={PlusCircle} label="Create Event" onClick={toggleMenu} />
+                                                )}
+                                                <MenuItem href="/admin/helpers" icon={Shield} label="Manage Helpers" onClick={toggleMenu} />
+                                            </ul>
+                                        </div>
                                     )}
-                                    <Link href="/admin/helpers">
-                                        <li className="flex items-center text-[#7e8590] gap-[10px] px-[7px] py-[4px] rounded-[6px] cursor-pointer transition-all duration-300 hover:bg-[#5353ff] hover:text-white hover:translate-x-[1px] hover:-translate-y-[1px] active:scale-[0.99] group">
-                                            <Shield className="w-[19px] h-[19px] transition-all duration-300 group-hover:stroke-white" />
-                                            <span className="font-semibold text-sm">Helpers</span>
-                                        </li>
-                                    </Link>
-                                </ul>
-                                <div className="border-t border-[#42434a] my-1"></div>
-                            </>
-                        )}
 
-
-                        {/* Action Section */}
-                        <ul className="list-none flex flex-col gap-[8px] px-[10px]">
-                            <form action={signout}>
-                                <button className="w-full flex items-center text-[#bd89ff] gap-[10px] px-[7px] py-[4px] rounded-[6px] cursor-pointer transition-all duration-300 hover:bg-[#8e2a2a] hover:text-white hover:translate-x-[1px] hover:-translate-y-[1px] active:scale-[0.99] group">
-                                    <LogOut className="w-[19px] h-[19px] stroke-[#bd89ff] transition-all duration-300 group-hover:stroke-white" />
-                                    <span className="font-semibold text-sm">Sign Out</span>
-                                </button>
-                            </form>
-                        </ul>
-
-                    </div>
-                </div>
+                                    {/* Sign Out (Stacked naturally) */}
+                                    <div className="pt-2">
+                                        <form action={async () => {
+                                            await signout();
+                                            toggleMenu();
+                                        }}>
+                                            <Button
+                                                variant="outline"
+                                                className="w-full justify-start gap-3 py-6 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 border-red-200 dark:border-red-900/30"
+                                            >
+                                                <LogOut className="w-5 h-5" />
+                                                <span className="font-medium">Sign Out</span>
+                                            </Button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>,
+                document.body
             )}
         </div>
+    );
+}
+
+// Helper Component for consistent links
+function MenuItem({ href, icon: Icon, label, onClick }: { href: string; icon: any; label: string; onClick: () => void }) {
+    return (
+        <li>
+            <Link
+                href={href}
+                onClick={onClick}
+                className="flex items-center justify-between p-3 rounded-xl text-foreground/80 hover:text-primary hover:bg-primary/5 active:bg-primary/10 transition-all group"
+            >
+                <div className="flex items-center gap-3">
+                    <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <span className="font-medium">{label}</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary/50 transition-colors" />
+            </Link>
+        </li>
     );
 }

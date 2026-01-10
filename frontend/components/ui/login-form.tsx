@@ -4,8 +4,9 @@
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { login, signup, loginWithGoogle } from "@/app/auth/actions";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -33,6 +34,19 @@ export function LoginForm({
     },
 }: LoginFormProps) {
     const [loading, setLoading] = useState(false);
+    const searchParams = useSearchParams();
+
+    useEffect(() => {
+        const message = searchParams.get("message");
+        const error = searchParams.get("error");
+
+        if (message) {
+            toast.success(message);
+        }
+        if (error) {
+            toast.error(error);
+        }
+    }, [searchParams]);
 
     async function handleSubmit(formData: FormData) {
         setLoading(true);
@@ -56,7 +70,7 @@ export function LoginForm({
             {/* Blur Layer for Auth Page Only */}
             <div className="absolute inset-0 backdrop-blur-[3px] z-0" />
 
-            <div className="absolute top-6 left-24 z-20">
+            <div className="absolute top-6 left-4 md:left-8 z-20">
                 <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors bg-background/50 px-4 py-2 rounded-full border border-border backdrop-blur-md">
                     <ArrowLeft className="w-4 h-4" /> Back to Home
                 </Link>

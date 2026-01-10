@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Check, X, Mail, CheckCircle, Edit, Trash2, Award, QrCode, RefreshCw, BarChart, Search, Filter } from 'lucide-react';
-import { updateAttendeeStatus, confirmAllAttendees } from '../../actions';
+import { updateAttendeeStatus, confirmAllAttendees, deleteEvent } from '../../actions';
 import { resendAttendeeEmail } from '@/actions/email';
 
 interface Attendee {
@@ -101,10 +101,21 @@ export default function AttendeeListClient({ attendees, event, admin }: Props) {
                                 Certificates
                             </Link>
                             <div className="hidden md:block h-8 w-px bg-white/10 mx-2"></div>
-                            <Link href={`/events/${event.id}/edit`} className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 text-gray-200 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hidden md:flex">
+                            <Link href={`/events/${event.id}/edit`} className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 text-gray-200 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg">
                                 <Edit className="w-4 h-4" />
-                                Edit
+                                <span className="hidden md:inline">Edit</span>
                             </Link>
+                            <button
+                                onClick={async () => {
+                                    if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+                                        await deleteEvent(event.id);
+                                    }
+                                }}
+                                className="flex items-center justify-center gap-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-100 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                                <span className="hidden md:inline">Delete</span>
+                            </button>
                         </>
                     )}
                 </div>
