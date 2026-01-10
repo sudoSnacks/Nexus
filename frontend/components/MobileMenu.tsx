@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { Menu, X, Home, Calendar, Ticket, Shield, PlusCircle, LogOut, ChevronRight } from 'lucide-react';
 import { signout } from '@/app/auth/actions';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 
 interface MobileMenuProps {
@@ -25,7 +25,7 @@ export default function MobileMenu({ user, isUserAdmin, isUserHelper }: MobileMe
     const toggleMenu = () => setIsOpen(!isOpen);
 
     // Drawer animation variants
-    const drawerVariants = {
+    const drawerVariants: Variants = {
         closed: { x: '-100%', opacity: 1 },
         open: { x: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 30 } },
     };
