@@ -1,6 +1,10 @@
-
 import { LoginForm } from "@/components/ui/login-form";
+import { Suspense } from "react";
 
 export default function LoginPage() {
-    return <LoginForm mode="login" />;
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <LoginForm mode="login" />
+        </Suspense>
+    );
 }
