@@ -81,6 +81,56 @@ export default async function RegisterPage({ params }: { params: Promise<{ id: s
                             />
                         </div>
 
+                        {/* Additional Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label htmlFor="phone_number" className="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5 ml-1">Phone Number</label>
+                                <input
+                                    id="phone_number"
+                                    name="phone_number"
+                                    type="tel"
+                                    required
+                                    className="block w-full rounded-lg border border-white/10 bg-white/5 py-3 px-4 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all outline-none"
+                                    placeholder="+91 98765 43210"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="branch_section" className="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5 ml-1">Branch / Section</label>
+                                <input
+                                    id="branch_section"
+                                    name="branch_section"
+                                    type="text"
+                                    required
+                                    className="block w-full rounded-lg border border-white/10 bg-white/5 py-3 px-4 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all outline-none"
+                                    placeholder="CSE - A"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="college_name" className="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5 ml-1">College Name</label>
+                            <input
+                                id="college_name"
+                                name="college_name"
+                                type="text"
+                                required
+                                className="block w-full rounded-lg border border-white/10 bg-white/5 py-3 px-4 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all outline-none"
+                                placeholder="Institute of Technology..."
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="college_email" className="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5 ml-1">College Email ID</label>
+                            <input
+                                id="college_email"
+                                name="college_email"
+                                type="email"
+                                required
+                                className="block w-full rounded-lg border border-white/10 bg-white/5 py-3 px-4 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all outline-none"
+                                placeholder="student@college.edu"
+                            />
+                        </div>
+
                         {/* Custom Questions */}
                         {event.custom_questions && Array.isArray(event.custom_questions) && event.custom_questions.map((q: any) => (
                             <div key={q.id}>

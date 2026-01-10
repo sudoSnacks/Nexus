@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 import BackgroundGradient from "@/components/BackgroundGradient";
 import { Home, Ticket, Calendar, MapPin } from "lucide-react";
 
+import { isAdmin, isHelper } from "@/utils/roles";
+import MobileMenu from "@/components/MobileMenu";
+
 export default async function MyTicketsPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -27,19 +30,33 @@ export default async function MyTicketsPage() {
         .neq('status', 'rejected') // Filter out rejected tickets
         .order('created_at', { ascending: false });
 
+    // Fetch roles for menu
+    const admin = await isAdmin();
+    const helper = await isHelper();
+
     return (
         <div className="min-h-screen text-foreground font-sans">
             <BackgroundGradient />
 
             {/* Header */}
             <header className="p-6 flex justify-between items-center border-b border-border backdrop-blur-sm bg-background/50 sticky top-0 z-50">
-                <Link href="/" className="flex items-center justify-center w-10 h-10 rounded-full bg-background/50 hover:bg-background/80 border border-border transition-all backdrop-blur-md group">
-                    <Home className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </Link>
+                <div className="flex items-center gap-4">
+                    {/* Mobile Menu (Left) */}
+                    <div className="md:hidden">
+                        <MobileMenu user={user} isUserAdmin={admin} isUserHelper={helper} />
+                    </div>
+
+                    <Link href="/" className="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-background/50 hover:bg-background/80 border border-border transition-all backdrop-blur-md group">
+                        <Home className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    </Link>
+                </div>
+
                 <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-green-400 hidden md:block">
                     My Tickets
                 </h1>
-                <Link href="/events" className="bg-background/50 hover:bg-background/80 border border-border text-foreground px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hover:shadow-primary/10 font-medium text-sm">
+
+                {/* Desktop Button */}
+                <Link href="/events" className="hidden md:block bg-background/50 hover:bg-background/80 border border-border text-foreground px-4 py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hover:shadow-primary/10 font-medium text-sm mr-16">
                     View Events
                 </Link>
             </header>

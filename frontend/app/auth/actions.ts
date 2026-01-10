@@ -15,15 +15,7 @@ export async function loginWithGoogle() {
     let redirectUrl = "http://localhost:3000/auth/callback";
 
     if (origin) {
-        // If origin exists, check if it's the production URL or custom domain
-        // If it's a known production domain, use it. Otherwise, fallback to localhost for safety/dev.
-        // For this specific request: "send the user to local host :3000 mobile after auth rather than gdgnexus.ddns.net"
-        if (origin.includes("gdgnexus.ddns.net")) {
-            // Force localhost redirect for mobile testing as requested
-            redirectUrl = "http://localhost:3000/auth/callback";
-        } else {
-            redirectUrl = `${origin}/auth/callback`;
-        }
+        redirectUrl = `${origin}/auth/callback`;
     }
 
     const { data, error } = await supabase.auth.signInWithOAuth({

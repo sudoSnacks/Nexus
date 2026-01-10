@@ -27,7 +27,7 @@ export function ThemeToggle() {
     return (
         <button
             onClick={cycleTheme}
-            className="fixed top-6 left-6 z-50 p-2 rounded-full bg-white/10 backdrop-blur-md border border-black/5 dark:border-white/10 shadow-lg hover:scale-110 transition-transform cursor-pointer group"
+            className="fixed top-6 right-6 z-50 p-2 rounded-full bg-white/10 backdrop-blur-md border border-black/5 dark:border-white/10 shadow-lg hover:scale-110 transition-transform cursor-pointer group"
             aria-label="Toggle theme"
         >
             <AnimatePresence mode="wait" initial={false}>

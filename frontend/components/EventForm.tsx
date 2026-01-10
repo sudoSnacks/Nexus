@@ -349,7 +349,15 @@ export default function EventForm({ mode, initialData, action }: EventFormProps)
     };
 
     return (
-        <form action={action} className="flex flex-col lg:flex-row h-screen bg-background text-foreground font-sans overflow-hidden">
+        <form
+            action={action}
+            className="flex flex-col lg:flex-row h-screen bg-background text-foreground font-sans overflow-hidden"
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+                    e.preventDefault();
+                }
+            }}
+        >
 
             {/* --- HIDDEN INPUTS FOR SERVER ACTION --- */}
             {mode === 'edit' && <input type="hidden" name="id" value={initialData?.id} />}
@@ -412,7 +420,7 @@ export default function EventForm({ mode, initialData, action }: EventFormProps)
                             disabled={isSubmitting}
                             className="px-8 py-3 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
                         >
-                            {isSubmitting ? 'Saving...' : (mode === 'edit' ? 'Save Changes' : 'Publish Event')}
+                            {isSubmitting ? 'Creating The Event...' : (mode === 'edit' ? 'Save Changes' : 'Publish Event')}
                         </button>
                     ) : (
                         <button

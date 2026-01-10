@@ -26,7 +26,9 @@ export async function sendDidYouGetInEmail(
 
             // Generate QR Code Data URL
             // This URL should point to the check-in page for the admin
-            const checkInUrl = `http://localhost:3000/admin/check-in/${eventDetails.ticketId}`;
+            // This URL should point to the check-in page for the admin
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+            const checkInUrl = `${baseUrl}/admin/check-in/${eventDetails.ticketId}`;
             const qrCodeUrl = await QRCode.toDataURL(checkInUrl);
 
             const bookingDate = new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
@@ -65,7 +67,7 @@ export async function sendDidYouGetInEmail(
                         date: eventDetails.date,
                         location: eventDetails.location,
                         organizer: "GDG Nexus",
-                        url: "http://localhost:3000"
+                        url: baseUrl
                     }}
                     qrCodeUrl={qrCodeUrl}
                 />

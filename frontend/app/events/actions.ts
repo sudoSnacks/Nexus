@@ -95,7 +95,15 @@ export async function deleteEvent(id: string) {
         })
     }
 
-    // 3. Delete Event (Cascade delete handles attendees)
+    // 3. Delete Tickets (Attendees) - Explicitly delete to ensure cleanup
+    const { error: attendeesError } = await supabase.from('attendees').delete().eq('event_id', id)
+
+    if (attendeesError) {
+        console.error('Error deleting event attendees:', attendeesError)
+        redirect('/error?message=Failed to delete event tickets')
+    }
+
+    // 4. Delete Event
     const { error } = await supabase.from('events').delete().eq('id', id)
 
     if (error) {
@@ -113,6 +121,10 @@ export async function registerAttendee(formData: FormData) {
     const event_id = formData.get('event_id') as string
     const name = formData.get('name') as string
     const email = formData.get('email') as string
+    const branch_section = formData.get('branch_section') as string
+    const phone_number = formData.get('phone_number') as string
+    const college_email = formData.get('college_email') as string
+    const college_name = formData.get('college_name') as string
 
     // 1. Fetch Event Details
     const { data: event, error: eventError } = await supabase.from('events').select('capacity, requires_approval, is_registration_closed').eq('id', event_id).single()
@@ -158,7 +170,11 @@ export async function registerAttendee(formData: FormData) {
         name,
         email,
         status,
-        registration_answers
+        registration_answers,
+        branch_section,
+        phone_number,
+        college_email,
+        college_name
     }
 
     const { data: attendee, error } = await supabase.from('attendees').insert(data).select().single()

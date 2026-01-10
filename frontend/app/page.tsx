@@ -97,13 +97,13 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <Link href="/events" className="hidden md:inline-flex group relative items-center justify-center px-6 py-2 overflow-hidden font-bold text-background rounded-full bg-foreground border border-foreground hover:opacity-90 transition-all duration-300">
+        <Link href="/events" className="hidden md:inline-flex group relative items-center justify-center px-6 py-2 overflow-hidden font-bold text-background rounded-full bg-foreground border border-foreground hover:opacity-90 transition-all duration-300 mr-16">
           <span className="mr-2">View Events</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </Link>
 
         {/* Mobile Menu Toggle */}
-        <div className="md:hidden">
+        <div className="md:hidden mr-16">
           <Link href="/events" className="p-2 text-sm bg-foreground/5 rounded-lg text-foreground">Events</Link>
         </div>
       </nav>
