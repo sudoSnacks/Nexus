@@ -46,6 +46,7 @@ const STEPS = [
     { id: 'logistics', title: 'Logistics', icon: MapPin, description: "Time & Place" },
     { id: 'content', title: 'Content', icon: Calendar, description: "AI Description" },
     { id: 'visuals', title: 'Visuals', icon: ImageIcon, description: "Images & Gallery" },
+    { id: 'confirm', title: 'Confirm', icon: CheckCircle, description: "Review & Publish" },
 ];
 
 export default function EventForm({ mode, initialData, action }: EventFormProps) {
@@ -109,22 +110,22 @@ export default function EventForm({ mode, initialData, action }: EventFormProps)
                 return (
                     <div className="space-y-6">
                         <div className="space-y-4">
-                            <label className="block text-sm font-medium text-gray-400">Event Name</label>
+                            <label className="block text-sm font-medium text-muted-foreground">Event Name</label>
                             <input
                                 type="text"
                                 required
                                 value={data.name}
                                 onChange={e => updateField('name', e.target.value)}
                                 placeholder="e.g. Google I/O Extended"
-                                className="w-full text-3xl font-bold bg-transparent border-b-2 border-white/10 focus:border-indigo-500 py-3 outline-none placeholder:text-gray-700 transition-colors"
+                                className="w-full text-3xl font-bold bg-transparent border-b-2 border-border focus:border-indigo-500 py-3 outline-none placeholder:text-muted-foreground/50 transition-colors"
                                 autoFocus
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4 pt-4">
                             {/* Capacity */}
-                            <div className="bg-white/5 border border-white/5 rounded-2xl p-4 hover:border-indigo-500/50 transition-colors group">
-                                <Users className="w-5 h-5 text-gray-500 group-hover:text-indigo-400 mb-2" />
-                                <label className="block text-xs text-gray-500 mb-1">Capacity</label>
+                            <div className="bg-muted/10 border border-border rounded-2xl p-4 hover:border-indigo-500/50 transition-colors group">
+                                <Users className="w-5 h-5 text-muted-foreground group-hover:text-indigo-400 mb-2" />
+                                <label className="block text-xs text-muted-foreground mb-1">Capacity</label>
                                 <input
                                     type="number"
                                     value={data.capacity}
@@ -323,13 +324,32 @@ export default function EventForm({ mode, initialData, action }: EventFormProps)
                         </div>
                     </div>
                 );
+
+            case 4: // CONFIRM
+                return (
+                    <div className="space-y-8">
+                        <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-8 text-center space-y-4">
+                            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <CheckCircle className="w-8 h-8 text-green-500" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-green-400">Ready to Publish?</h2>
+                            <p className="text-muted-foreground max-w-md mx-auto">
+                                You are about to create <strong>{data.name}</strong> on <strong>{data.date ? new Date(data.date).toLocaleDateString() : '...'}</strong> at <strong>{data.location}</strong>.
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                                Please review your details one last time. You can still go back and edit anything.
+                            </p>
+                        </div>
+                    </div>
+                );
+
             default:
                 return null;
         }
     };
 
     return (
-        <form action={action} className="flex flex-col lg:flex-row h-screen bg-black text-white font-sans overflow-hidden">
+        <form action={action} className="flex flex-col lg:flex-row h-screen bg-background text-foreground font-sans overflow-hidden">
 
             {/* --- HIDDEN INPUTS FOR SERVER ACTION --- */}
             {mode === 'edit' && <input type="hidden" name="id" value={initialData?.id} />}
@@ -345,11 +365,11 @@ export default function EventForm({ mode, initialData, action }: EventFormProps)
             <input type="hidden" name="ai_key_times_json" value={JSON.stringify(data.ai_key_times)} />
 
             {/* --- LEFT PANEL: NAVIGATION & FORM --- */}
-            <div className={`flex flex-col h-full border-r border-white/5 bg-black z-10 ${mode === 'edit' ? 'lg:w-1/2 w-full' : 'w-full max-w-4xl mx-auto border-x'}`}>
+            <div className={`flex flex-col h-full border-r border-border bg-background z-10 ${mode === 'edit' ? 'lg:w-1/2 w-full' : 'w-full max-w-4xl mx-auto border-x'}`}>
 
                 {/* Header */}
-                <div className="p-6 md:p-8 flex justify-between items-center border-b border-white/5">
-                    <Link href="/events" className="text-sm font-medium text-gray-400 hover:text-white flex items-center gap-2 transition-colors">
+                <div className="p-6 md:p-8 flex justify-between items-center border-b border-border">
+                    <Link href="/events" className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors">
                         <ArrowLeft className="w-4 h-4" /> Back
                     </Link>
                     <div className="flex gap-2">
@@ -366,8 +386,8 @@ export default function EventForm({ mode, initialData, action }: EventFormProps)
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8">
                     <div className="max-w-xl mx-auto">
                         <div className="mb-8">
-                            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{STEPS[currentStep].title}</h1>
-                            <p className="text-gray-500">{STEPS[currentStep].description}</p>
+                            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{STEPS[currentStep].title}</h1>
+                            <p className="text-muted-foreground">{STEPS[currentStep].description}</p>
                         </div>
 
                         {renderStepContent(currentStep)}
@@ -375,7 +395,7 @@ export default function EventForm({ mode, initialData, action }: EventFormProps)
                 </div>
 
                 {/* Footer Controls */}
-                <div className="p-6 md:p-8 border-t border-white/10 bg-black/50 backdrop-blur-md flex justify-between">
+                <div className="p-6 md:p-8 border-t border-border bg-background/50 backdrop-blur-md flex justify-between">
                     <button
                         type="button"
                         onClick={prevStep}

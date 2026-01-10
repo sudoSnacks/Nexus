@@ -36,13 +36,13 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
     const eventDate = new Date(event.date);
 
     return (
-        <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-indigo-500/30">
+        <div className="min-h-screen bg-background text-foreground font-sans selection:bg-indigo-500/30">
             <BackgroundGradient />
 
             {/* Navbar / Back Button */}
             <nav className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-center pointer-events-none">
-                <Link href="/events" className="pointer-events-auto flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md transition-all group">
-                    <ArrowLeft className="w-5 h-5 text-gray-300 group-hover:text-white" />
+                <Link href="/events" className="pointer-events-auto flex items-center justify-center w-10 h-10 rounded-full bg-background/50 hover:bg-background/80 border border-border backdrop-blur-md transition-all group">
+                    <ArrowLeft className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
                 </Link>
                 {/* Logo or Brand could go here */}
             </nav>
@@ -59,12 +59,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                             </div>
 
                             {/* Title */}
-                            <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight leading-tight max-w-4xl">
+                            <h1 className="text-5xl md:text-7xl font-bold text-foreground tracking-tight leading-tight max-w-4xl">
                                 {event.name}
                             </h1>
 
                             {/* Meta */}
-                            <div className="flex flex-wrap gap-6 text-gray-300 text-lg">
+                            <div className="flex flex-wrap gap-6 text-muted-foreground text-lg">
                                 <div className="flex items-center gap-2">
                                     <Clock className="w-5 h-5 text-indigo-400" />
                                     {eventDate.toLocaleTimeString("en-US", { hour: 'numeric', minute: '2-digit' })}
@@ -85,8 +85,8 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                     <div className="md:col-span-2 space-y-12">
                         {/* Event Description */}
                         <div>
-                            <h2 className="text-2xl font-bold text-white mb-6">About the Event</h2>
-                            <div className="prose prose-lg prose-invert text-gray-300 leading-relaxed whitespace-pre-wrap">
+                            <h2 className="text-2xl font-bold text-foreground mb-6">About the Event</h2>
+                            <div className="prose prose-lg dark:prose-invert text-muted-foreground leading-relaxed whitespace-pre-wrap">
                                 {event.ai_summary || "No description available yet."}
                             </div>
                         </div>
@@ -94,10 +94,10 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                         {/* Gallery */}
                         {event.gallery_images && event.gallery_images.length > 0 && (
                             <div>
-                                <h2 className="text-2xl font-bold text-white mb-6">Gallery</h2>
+                                <h2 className="text-2xl font-bold text-foreground mb-6">Gallery</h2>
                                 <div className="grid grid-cols-2 gap-4">
                                     {event.gallery_images.map((url: string, idx: number) => (
-                                        <div key={idx} className={`relative rounded-xl overflow-hidden border border-white/10 ${idx === 0 ? 'col-span-2 h-64 md:h-80' : 'h-48'}`}>
+                                        <div key={idx} className={`relative rounded-xl overflow-hidden border border-border ${idx === 0 ? 'col-span-2 h-64 md:h-80' : 'h-48'}`}>
                                             <img src={url} alt={`Gallery ${idx}`} className="absolute w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                                         </div>
                                     ))}
@@ -111,10 +111,10 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                         <div className="sticky top-24 space-y-8">
 
                             {/* Registration Card */}
-                            <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
+                            <div className="p-6 rounded-2xl bg-card border border-border backdrop-blur-xl shadow-2xl">
                                 <div className="mb-6">
-                                    <h3 className="text-xl font-bold text-white mb-1">Registration</h3>
-                                    <p className="text-gray-400 text-sm">Secure your spot today.</p>
+                                    <h3 className="text-xl font-bold text-card-foreground mb-1">Registration</h3>
+                                    <p className="text-muted-foreground text-sm">Secure your spot today.</p>
                                 </div>
 
                                 <Link
@@ -133,13 +133,13 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
                             {/* Highlights */}
                             {highlights.length > 0 && (
-                                <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
-                                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">
+                                <div className="p-6 rounded-2xl bg-card/50 border border-border">
+                                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">
                                         Effect Highlights
                                     </h3>
                                     <ul className="space-y-4">
                                         {highlights.map((item, idx) => (
-                                            <li key={idx} className="flex gap-3 text-gray-300 text-sm">
+                                            <li key={idx} className="flex gap-3 text-muted-foreground text-sm">
                                                 <div className="mt-1 w-5 h-5 rounded-full bg-indigo-500/20 flex items-center justify-center shrink-0">
                                                     <Check className="w-3 h-3 text-indigo-400" />
                                                 </div>

@@ -15,11 +15,11 @@ export default async function EventsPage() {
     const isUserHelper = await isHelper();
 
     return (
-        <div className="min-h-screen text-gray-100 font-sans">
+        <div className="min-h-screen text-foreground font-sans">
             <BackgroundGradient />
-            <header className="p-6 flex justify-between items-center border-b border-white/10 backdrop-blur-sm bg-black/20">
-                <Link href="/" className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 transition-all backdrop-blur-md group">
-                    <Home className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+            <header className="p-6 flex justify-between items-center border-b border-border backdrop-blur-sm bg-background/50">
+                <Link href="/" className="flex items-center justify-center w-10 h-10 rounded-full bg-background/50 hover:bg-background/80 border border-border transition-all backdrop-blur-md group">
+                    <Home className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                 </Link>
                 {user ? (
                     <div className="flex items-center gap-2 md:gap-4">
@@ -35,7 +35,7 @@ export default async function EventsPage() {
                         {isUserAdmin && (
                             <Link
                                 href="/events/new"
-                                className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-2 py-1 text-xs md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hover:shadow-white/10 font-medium"
+                                className="bg-background/50 hover:bg-background/80 border border-border text-foreground px-2 py-1 text-xs md:text-base md:px-4 md:py-2 rounded-lg backdrop-blur-md transition-all shadow-lg hover:shadow-primary/10 font-medium"
                             >
                                 + Create Event
                             </Link>
@@ -46,8 +46,8 @@ export default async function EventsPage() {
                         >
                             My Tickets
                         </Link>
-                        <span className="text-sm text-gray-400 hidden sm:inline"> | </span>
-                        <span className="text-sm text-gray-400 hidden sm:inline">{user.email}</span>
+                        <span className="text-sm text-muted-foreground hidden sm:inline"> | </span>
+                        <span className="text-sm text-muted-foreground hidden sm:inline">{user.email}</span>
                         <form action={signout}>
                             <button className="text-red-400 hover:text-red-300 text-sm font-medium transition-colors">
                                 Sign out
@@ -63,7 +63,7 @@ export default async function EventsPage() {
             </header >
 
             <main className="container mx-auto px-4 py-16">
-                <h2 className="text-4xl font-bold mb-12 text-center text-white">
+                <h2 className="text-4xl font-bold mb-12 text-center text-foreground">
                     Upcoming Events
                 </h2>
 

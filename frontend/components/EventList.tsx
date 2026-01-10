@@ -40,7 +40,7 @@ export default function EventList({ events, user, isUserAdmin, isUserHelper }: E
                 return (
                     <div
                         key={event.id}
-                        className="group relative bg-[#1e1e1e] rounded-3xl overflow-hidden border border-white/5 hover:border-white/10 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col"
+                        className="group relative bg-card rounded-3xl overflow-hidden border border-border hover:border-primary/20 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col"
                     >
                         {/* --- Image Section --- */}
                         <Link href={`/events/${event.id}`} className="relative h-48 w-full overflow-hidden bg-black block cursor-pointer">
@@ -49,7 +49,7 @@ export default function EventList({ events, user, isUserAdmin, isUserHelper }: E
                                 alt={event.name}
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#1e1e1e] to-transparent opacity-60" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-60" />
 
                             {/* Top Badges */}
                             <div className="absolute top-4 left-4">
@@ -69,7 +69,7 @@ export default function EventList({ events, user, isUserAdmin, isUserHelper }: E
                         {/* --- Content Section --- */}
                         <div className="p-6 pt-2 flex flex-col flex-grow relative">
                             {/* Date/Time Row */}
-                            <div className="flex items-center gap-6 text-sm text-gray-400 mb-4 border-b border-white/5 pb-4">
+                            <div className="flex items-center gap-6 text-sm text-muted-foreground mb-4 border-b border-border pb-4">
                                 <div className="flex items-center gap-2">
                                     <span className="text-indigo-400">📅</span>
                                     <span>
@@ -86,18 +86,18 @@ export default function EventList({ events, user, isUserAdmin, isUserHelper }: E
 
                             {/* Title */}
                             <Link href={`/events/${event.id}`} className="block mb-3">
-                                <h3 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors leading-tight">
+                                <h3 className="text-xl font-bold text-card-foreground group-hover:text-primary transition-colors leading-tight">
                                     {event.name}
                                 </h3>
                             </Link>
 
                             {/* Location/Desc */}
-                            <p className="text-gray-400 text-sm line-clamp-2 mb-6 flex-grow">
+                            <p className="text-muted-foreground text-sm line-clamp-2 mb-6 flex-grow">
                                 {event.ai_summary ? event.ai_summary.replace(/[*#]/g, '') : `Join us at ${event.location} for this amazing event.`}
                             </p>
 
                             {/* Footer */}
-                            <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-white/5">
+                            <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-border">
                                 <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
                                     <div className="flex items-center gap-2">
                                         <div className="flex -space-x-2">
@@ -111,7 +111,7 @@ export default function EventList({ events, user, isUserAdmin, isUserHelper }: E
 
                                 <div className="flex gap-3">
                                     {(isCompleted || event.is_registration_closed) ? (
-                                        <button disabled className="w-full px-4 py-3 bg-gray-800 text-gray-500 text-sm font-semibold rounded-xl cursor-not-allowed text-center">
+                                        <button disabled className="w-full px-4 py-3 bg-muted text-muted-foreground text-sm font-semibold rounded-xl cursor-not-allowed text-center">
                                             {event.is_registration_closed ? "Registration Closed" : "Event Ended"}
                                         </button>
                                     ) : (
@@ -126,7 +126,7 @@ export default function EventList({ events, user, isUserAdmin, isUserHelper }: E
                                     {showManageButton && (
                                         <Link
                                             href={`/events/${event.id}/attendees`}
-                                            className="px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium rounded-xl transition-all hover:scale-[1.02] text-center flex items-center justify-center whitespace-nowrap"
+                                            className="px-4 py-3 bg-secondary hover:bg-secondary/80 border border-border text-secondary-foreground font-medium rounded-xl transition-all hover:scale-[1.02] text-center flex items-center justify-center whitespace-nowrap"
                                         >
                                             Manage
                                         </Link>
@@ -139,11 +139,11 @@ export default function EventList({ events, user, isUserAdmin, isUserHelper }: E
             })}
 
             {(!events || events.length === 0) && (
-                <div className="col-span-full flex flex-col items-center justify-center py-24 text-gray-500 bg-white/5 rounded-3xl border border-white/5 border-dashed">
-                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                <div className="col-span-full flex flex-col items-center justify-center py-24 text-muted-foreground bg-card rounded-3xl border border-border border-dashed">
+                    <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mb-4">
                         <span className="text-2xl">📅</span>
                     </div>
-                    <p className="text-xl font-medium text-white mb-2">No events found</p>
+                    <p className="text-xl font-medium text-card-foreground mb-2">No events found</p>
                     <p className="text-sm mb-6">There are no upcoming events scheduled.</p>
                     {user && isUserAdmin && (
                         <Link href="/events/new" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all">
